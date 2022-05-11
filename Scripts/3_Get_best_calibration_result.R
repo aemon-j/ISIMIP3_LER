@@ -81,7 +81,7 @@ for(i in lakes){
                          return(result)
                        },
                        NULL = function(x){
-                         result = " "
+                         result = ""
                          class(result) = "verbatim"
                          return(result)
                        }

@@ -1,6 +1,7 @@
 # Provides folder structure
 
-folder_root = "C:/Users/mesman/Documents/Projects/2021/ISIMIP3 - LakeEnsemblR"
+dir_name = dirname(rstudioapi::getActiveDocumentContext()$path)
+folder_root = file.path(dir_name, "..")
 
 folder_scripts = "Scripts"
 folder_data = "ISIMIP data"
