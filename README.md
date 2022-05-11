@@ -1,7 +1,4 @@
-# ISIMIP3_LER
-Workflow to run ISIMIP3 simulations using LakeEnsemblR
-
-## Workflow
+# Workflow
 
 1. Change root directory in the Folder_structure.R document.
 2. Fill in the Settings.R document to change settings for the runs. 

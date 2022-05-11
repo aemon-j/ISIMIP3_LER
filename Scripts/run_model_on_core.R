@@ -13,6 +13,12 @@ setDT(sim_tasks)
 
 sim_tasks = sim_tasks[Core == core_job]
 
+add_to_report(file.path(folder_root, folder_report), report_name, 4L, core_job,
+              paste0("Tasks (", nrow(sim_tasks), "): ", paste(sim_tasks[, Lakes],
+                                                              sim_tasks[, GCM],
+                                                              sim_tasks[, Scen],
+                                                              sep = "_",
+                                                              collapse = ", ")))
 
 for(i in seq_len(nrow(sim_tasks))){
   sim_folder = file.path(folder_root,
@@ -26,9 +32,6 @@ for(i in seq_len(nrow(sim_tasks))){
   run_ensemble(config_file = "LakeEnsemblR.yaml",
                model = models_to_run)
   
-  
-  print(paste("Core number", core_job, ", task",
-              sim_tasks[i, Lakes], sim_tasks[i, GCM], sim_tasks[i, Scen],
-              "completed!"))
+  add_to_report(file.path(folder_root, folder_report), report_name, 4L, core_job,
+                paste0("Completed: ", paste(sim_tasks[i, Lakes], sim_tasks[i, GCM], sim_tasks[i, Scen], sep = "_")))
 }
-

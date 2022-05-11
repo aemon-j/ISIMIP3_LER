@@ -13,6 +13,8 @@ setDT(cal_tasks)
 
 cal_tasks = cal_tasks[Core == core_job]
 
+add_to_report(file.path(folder_root, folder_report), report_name, 2L, core_job,
+              paste0("Tasks (", nrow(cal_tasks), "): ", paste0(cal_tasks[, Lakes], collapse = ", ")))
 
 for(i in seq_len(nrow(cal_tasks))){
   cal_folder = file.path(folder_root,
@@ -35,11 +37,7 @@ for(i in seq_len(nrow(cal_tasks))){
   # Either work with folder = "." and setwd, or fix. 
   # I'd say it's an important thing to fix, but not doable right now, so let's use setwd
   
+  add_to_report(file.path(folder_root, folder_report), report_name, 2L, core_job,
+                paste0("Completed: ", cal_tasks[i, Lakes]))
   
-  print(paste("Core number", core_job, ", task", cal_tasks[i, Lakes], "completed!"))
 }
-
-
-
-
-
