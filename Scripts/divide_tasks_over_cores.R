@@ -13,7 +13,7 @@ divide_tasks_over_cores = function(cal_tasks, num_cores){
   df_runtime_pred = fread(file.path(folder_root, folder_test_result, "Runtime_Equation.csv"))
   
   # Get number of layers and length of simulation for each lake, and predict runtime 
-  df_runtime = suppressWarnings({data.table(Lakes = cal_tasks[, Lakes],
+  df_runtime = suppressWarnings({data.table(Lakes = unique(cal_tasks[, Lakes]),
                                             Layers = as.numeric(),
                                             Duration = as.numeric(),
                                             Runtime = as.numeric())}) 
