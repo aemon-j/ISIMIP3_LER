@@ -1,7 +1,8 @@
 ##### ISIMIP settings -----
 
-gcms = c("GFDL-ESM2M", "HadGEM2-ES", "IPSL-CM5A-LR", "MIROC5", "EWEMBI")
-scens = c("historical", "piControl", "rcp26", "rcp60", "rcp85", "calibration")
+gcms = c("GFDL-ESM4", "IPSL-CM6A-LR", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
+calib_gcm = "GSWP3-W5E5"
+scens = c("historical", "piControl", "ssp126", "ssp370", "ssp585", "calibration")
 lakes = c("Allequash_Lake", "Alqueva", "Annecy", "Annie", "Argyle", "Biel", 
           "Big_Muskellunge_Lake", "Black_Oak_Lake", "Bourget", "Burley_Griffin", 
           "Crystal_Bog", "Crystal_Lake", "Delavan", "Dickie_Lake", "Eagle_Lake", 
