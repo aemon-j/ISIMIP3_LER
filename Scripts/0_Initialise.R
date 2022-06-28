@@ -17,6 +17,7 @@ source("get_output_resolution.R")
 source("get_start_end_date.R")
 source("get_var_from_nc.R")
 source("merge_temp_obs.R")
+source("unzip_isimip.R")
 
 # Set TZ to "UTC"
 Sys.setenv(TZ = "UTC")
