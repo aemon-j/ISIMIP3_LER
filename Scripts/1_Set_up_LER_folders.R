@@ -59,9 +59,14 @@ for(i in lakes){
   # Elevation: read from document created in Raman-Vinna's project
   df_char = fread(file.path(folder_root, folder_other, "LakeCharacteristics.csv"))
   elev = df_char[`Lake Name Folder` == i, `elevation (m)`]
+  latitude = df_char[`Lake Name Folder` == i, `latitude (dec deg)`]
+  longitude = df_char[`Lake Name Folder` == i, `longitude (dec deg)`]
   
-  for(j in gcms){
+  for(j in c(gcms, calib_gcm)){
     for(k in scens){
+      if(j != calib_gcm & k == "calibration") next
+      if(j == calib_gcm & k != "calibration") next
+      
       the_folder = file.path(folder_root, folder_data, i, j, k)
       
       if(!dir.exists(the_folder) | length(list.files(the_folder)) == 0L){
@@ -92,21 +97,16 @@ for(i in lakes){
                 overwrite = T)
       
       ### Location and time settings
-      nc_file = list.files(the_folder)
-      nc_file = nc_file[grepl(".nc", nc_file)][1]
-      start_end_dates = get_start_end_date(file.path(the_folder, nc_file))
+      df_meteo = fread(file.path(the_folder, "meteo.csv"))
+      start_end_dates = c(df_meteo[1L, datetime],
+                          df_meteo[.N, datetime])
       start_end_dates = format(start_end_dates, "%Y-%m-%d %H:%M:%S")
       
       if(k == "calibration"){
         start_end_dates = c(df_obs[1L, datetime], df_obs[.N, datetime])
       }
       
-      # Latitude and longitude: take from ISIMIP meteo input files
-      nc = nc_open(file.path(the_folder, nc_file))
-      latitude = ncvar_get(nc, "lat")
-      longitude = ncvar_get(nc, "lon")
-      nc_close(nc)
-      
+      # Latitude and longitude: take from LakeCharacteristics file
       input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
                           key1 = "time", key2 = "start", value = start_end_dates[1], verbose = F)
       input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
@@ -157,9 +157,6 @@ for(i in lakes){
         add_spin_up(the_folder, spin_up_years = spin_up_period)
       }
       
-      # Still need to know what dataset to use for calibration: historical, EWEMBI, or a 
-      # combination of historical and rcp60? 
-      
       export_config("LakeEnsemblR.yaml",
                     model = models_to_run,
                     folder = the_folder)
@@ -170,4 +167,3 @@ for(i in lakes){
   progress = progress + 1
   setTxtProgressBar(progressBar,progress)
 }
-

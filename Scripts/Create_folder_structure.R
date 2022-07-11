@@ -16,7 +16,7 @@ for(i in scens){
     isimip_files = list.files(file.path(folder_root, folder_isimip_calib_files))
     
     if(length(grep(".txt", isimip_files)) == 0L){
-      unzip_isimip(file.path(folder_root, folder_isimip_root, i, j))
+      unzip_isimip(file.path(folder_root, folder_isimip_root, i))
     }
     
   }else{
@@ -37,7 +37,7 @@ for(i in scens){
 for(i in lakes){
   # If there are no data for this lake on the portal, skip
   filename = paste(tolower(gcms[1]), "r1i1p1f1_w5e5",
-                   scens[1], "hurs", tolower(i), "daily", sep = "_")
+                   scens[1], "hurs", tolower(i), "daily.txt", sep = "_")
   if(!file.exists(file.path(folder_root, folder_isimip_root,
                             scens[1], gcms[1], filename))){
     warning("No data found for lake ", i)
@@ -46,6 +46,8 @@ for(i in lakes){
   
   for(j in gcms){
     for(k in scens){
+      if(k == "calibration") next
+      
       the_folder = file.path(folder_root,
                              folder_data,
                              i, tolower(j), k)
@@ -53,18 +55,29 @@ for(i in lakes){
         dir.create(the_folder, recursive = TRUE)
       }
       
-      if(k == "calibration"){
-        files_to_copy = list.files(file.path(folder_root, folder_isimip_calib_files),
-                                   pattern = ".txt")
-      }else{
-        files_to_copy = list.files(file.path(folder_root, folder_isimip_root,
-                                             k, j), pattern = ".txt")
-      }
+      files_to_copy = list.files(file.path(folder_root, folder_isimip_root,
+                                           k, j), pattern = ".txt")
       files_to_copy = files_to_copy[grepl(tolower(i), files_to_copy)]
       
       file.copy(from = file.path(folder_root, folder_isimip_root,
                                  k, j, files_to_copy),
                 the_folder, overwrite = TRUE)
     }
+  }
+  
+  if("calibration" %in% scens){
+    the_folder = file.path(folder_root,
+                           folder_data,
+                           i, tolower(calib_gcm), "calibration")
+    if(!dir.exists(the_folder)){
+      dir.create(the_folder, recursive = TRUE)
+    }
+    files_to_copy = list.files(file.path(folder_root, folder_isimip_calib_files),
+                               pattern = ".txt")
+    files_to_copy = files_to_copy[grepl(tolower(i), files_to_copy)]
+    
+    file.copy(from = file.path(folder_root, folder_isimip_calib_files,
+                               files_to_copy),
+              the_folder, overwrite = TRUE)
   }
 }
