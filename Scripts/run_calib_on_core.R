@@ -20,7 +20,7 @@ for(i in seq_len(nrow(cal_tasks))){
   cal_folder = file.path(folder_root,
                          folder_data,
                          cal_tasks[i, Lakes],
-                         "ewembi",
+                         tolower(calib_gcm),
                          "calibration")
   
   setwd(cal_folder)

@@ -13,7 +13,7 @@ progress = 0
 
 for(i in lakes){
   
-  the_folder = file.path(folder_root, folder_data, i, "ewembi", "calibration", "cali")
+  the_folder = file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "cali")
   
   if(!dir.exists(the_folder) | length(list.files(the_folder)) == 0L){
     progress = progress + 1
@@ -49,7 +49,7 @@ for(i in lakes){
     # Enter information in the LER config file in the folder of every gcm
     pars_to_set = names(df_cal)[!(names(df_cal) %in% c("par_id", "rmse"))]
     
-    for(k in gcms[!(gcms %in% "EWEMBI")]){
+    for(k in gcms){
       for(l in scens[!(scens %in% "calibration")]){
         
         LER_config_path = file.path(folder_root, folder_data, i, tolower(k), l, "LakeEnsemblR.yaml")
@@ -81,7 +81,7 @@ for(i in lakes){
                          return(result)
                        },
                        NULL = function(x){
-                         result = ""
+                         result = "NULL"
                          class(result) = "verbatim"
                          return(result)
                        }
@@ -91,7 +91,7 @@ for(i in lakes){
   }
   
   # Update the config file for every sub-folder of the lake
-  for(j in gcms[!(gcms %in% "EWEMBI")]){
+  for(j in gcms){
     for(k in scens[!(scens %in% "calibration")]){
       export_config("LakeEnsemblR.yaml",
                     model = models_to_run,
@@ -104,4 +104,3 @@ for(i in lakes){
   progress = progress + 1
   setTxtProgressBar(progressBar,progress)
 }
-
