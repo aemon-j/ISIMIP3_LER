@@ -11,7 +11,7 @@ sim_tasks = data.table(Lakes = lakes,
 
 # Lakes with a non-existing calibration folder or an empty one need to be removed
 for(i in seq_len(nrow(sim_tasks))){
-  the_folder = file.path(folder_root, folder_data, sim_tasks[i, Lakes], "ewembi", "calibration")
+  the_folder = file.path(folder_root, folder_data, sim_tasks[i, Lakes], tolower(calib_gcm), "calibration")
   if(!dir.exists(the_folder) | length(list.files(the_folder)) == 0L){
     sim_tasks[i, Data := 0L]
   }
@@ -20,7 +20,7 @@ sim_tasks = sim_tasks[Data == 1L]
 lakes = sim_tasks[, Lakes]
 
 # Now also multiple gcms and scens
-sim_tasks = expand.grid(lakes, gcms[!(gcms %in% "EWEMBI")], scens[!(scens %in% "calibration")])
+sim_tasks = expand.grid(lakes, gcms, scens[!(scens %in% "calibration")])
 setDT(sim_tasks)
 setnames(sim_tasks, c("Lakes", "GCM", "Scen"))
 setorder(sim_tasks, Lakes, GCM)

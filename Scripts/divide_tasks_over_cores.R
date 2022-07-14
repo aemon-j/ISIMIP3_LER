@@ -26,8 +26,8 @@ divide_tasks_over_cores = function(cal_tasks, num_cores){
   for(i in seq_len(nrow(df_runtime))){
     lakename = df_runtime[i, Lakes]
     
-    df_hyps = fread(file.path(folder_root, folder_data, lakename, "gfdl-esm2m/calibration/hypsograph.csv"))
-    df_obs = fread(file.path(folder_root, folder_data, lakename, "gfdl-esm2m/calibration/obs_wtemp.csv"))
+    df_hyps = fread(file.path(folder_root, folder_data, lakename, tolower(calib_gcm), "calibration/hypsograph.csv"))
+    df_obs = fread(file.path(folder_root, folder_data, lakename, tolower(calib_gcm), "calibration/obs_wtemp.csv"))
     
     max_depth = max(df_hyps[, Depth_meter])
     layer_thickness = get_output_resolution(max_depth)
