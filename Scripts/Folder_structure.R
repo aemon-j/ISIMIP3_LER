@@ -11,3 +11,4 @@ folder_test_result = "Other/Test dataset"
 folder_report = "Reports"
 folder_isimip_root = "ISIMIPdownload"
 folder_isimip_calib_files = file.path(folder_isimip_root, "calibration")
+folder_cal_files = "Cal_files"

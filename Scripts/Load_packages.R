@@ -6,7 +6,8 @@ req_packages = c("data.table",
                  "lubridate",
                  "ncdf4",
                  "parallel",
-                 "configr")
+                 "configr",
+                 "FME")
 
 # Make sure all packages are installed and then load them
 suppressWarnings({

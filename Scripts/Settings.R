@@ -33,7 +33,7 @@ report_name = "Test"
 ##### Calibration settings -----
 
 frac_of_cores = 0.75 # Fraction of available cores to use, rounded up. 
-cal_iterations = 1000
+cal_iterations = 150
 cmethod = "LHC" # Calibration method to use, see ?cali_ensemble
 
 #### IMPORTANT!!!!!
