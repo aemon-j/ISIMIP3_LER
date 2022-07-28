@@ -7,6 +7,8 @@
 
 # Lowest rmse is assumed to be the best fit
 
+load("my_environment.RData")
+sapply(loaded_packages, library, character.only = T)
 
 progressBar = txtProgressBar(min = 0, max = length(lakes), initial = 0)
 progress = 0
