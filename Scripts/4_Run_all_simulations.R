@@ -3,9 +3,12 @@
 
 # Can test for Biel/ipsl-cm5a-lr/rcp85
 
-# As in script 2, divide tasks over cores. I should define the cal_tasks and then make a function
+# As in script 2, divide tasks over cores. I should define the sim_tasks and then make a function
 # that returns the division per core.
-# Calibration tasks
+
+load("my_environment.RData")
+sapply(loaded_packages, library, character.only = T)
+
 sim_tasks = data.table(Lakes = lakes,
                        Data = 1L)
 
