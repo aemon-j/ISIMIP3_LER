@@ -44,9 +44,12 @@ output:
    time_unit: day                               # time unit [second, hour, day]
    time_step: 1                                 # number of time units between output [min=1]
    time_method: mean                            # treatment of time dimension [point=instantaneous, mean, integrated; only used in GOTM]
+   max_members: 1
    variables:
       - temp
       - ice_height
+      - q_sens
+      - q_lat
 scaling_factors:                                # scaling factors to apply to meteorological input, either for all models or model-specific. If not specified, no scaling is applied. If both "all" and model-specific are specified for a certain model, only the model-specific scaling is applied.
    all:
       wind_speed: 1.0
