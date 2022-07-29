@@ -8,7 +8,7 @@
 # lakes = c("Allequash_Lake", "Annie", "Biel")
 
 load("my_environment.RData")
-sapply(loaded_packages, library, character.only = T)
+invisible(sapply(loaded_packages, library, character.only = T))
 
 # Calibration tasks
 cal_tasks = data.table(Lakes = lakes,
