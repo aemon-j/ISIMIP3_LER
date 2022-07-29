@@ -7,7 +7,7 @@
 # that returns the division per core.
 
 load("my_environment.RData")
-sapply(loaded_packages, library, character.only = T)
+invisible(sapply(loaded_packages, library, character.only = T))
 
 sim_tasks = data.table(Lakes = lakes,
                        Data = 1L)

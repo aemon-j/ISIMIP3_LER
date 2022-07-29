@@ -5,7 +5,10 @@
 # (they should be put in the lakes folder, see 1_Set_up_LER_folders.R,
 # but obs do not yet need to be compiled)
 
-# Run Folder_structure.R and 0_Initialise.R first
+# Run 0_Initialise.R first
+
+load("my_environment.RData")
+invisible(sapply(loaded_packages, library, character.only = T))
 
 # Unzip all the nc files, if not already done so
 for(i in scens){

@@ -8,6 +8,7 @@ folder_scripts = "Scripts"
 folder_data = "ISIMIPdata"
 folder_template_LER = "LER_template"
 folder_other = "Other"
+folder_out = "Output"
 folder_test_result = "Other/Test dataset"
 folder_report = "Reports"
 folder_isimip_root = "ISIMIPdownload"
@@ -32,6 +33,7 @@ source("get_var_from_nc.R")
 source("merge_temp_obs.R")
 source("temp_to_dens.R")
 source("unzip_isimip.R")
+source("write_isimip_netcdf.R")
 
 # Set TZ to "UTC"
 Sys.setenv(TZ = "UTC")

@@ -2,7 +2,7 @@
 # However, before this step, the file structure should be in place - see 0_Create_folder_structure.R
 
 load("my_environment.RData")
-sapply(loaded_packages, library, character.only = T)
+invisible(sapply(loaded_packages, library, character.only = T))
 
 progressBar = txtProgressBar(min = 0, max = length(lakes), initial = 0)
 progress = 0
