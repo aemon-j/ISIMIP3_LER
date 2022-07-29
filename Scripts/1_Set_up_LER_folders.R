@@ -70,7 +70,7 @@ for(i in lakes){
       if(j != calib_gcm & k == "calibration") next
       if(j == calib_gcm & k != "calibration") next
       
-      the_folder = file.path(folder_root, folder_data, i, j, k)
+      the_folder = file.path(folder_root, folder_data, i, tolower(j), k)
       
       if(!dir.exists(the_folder) | length(list.files(the_folder)) == 0L){
         progress = progress + 1
