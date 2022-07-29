@@ -97,6 +97,7 @@ for(i in lakes){
         setnames(df_thermo_depth, paste0("wtr_", abs(depths)))
         df_thermo_depth[, datetime := time]
         df_thermo_depth = suppressWarnings(ts.thermo.depth(df_thermo_depth, na.rm = T)[[2L]])
+        df_thermo_depth[is.na(df_thermo_depth)] = 0 # Set NA's for thermocline depth to 0
         
         var_name = "thermodepth"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
