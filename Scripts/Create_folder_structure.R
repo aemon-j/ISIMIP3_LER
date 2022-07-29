@@ -22,12 +22,12 @@ for(i in scens){
   }else{
     for(j in gcms){
       if(!dir.exists(file.path(folder_root, folder_isimip_root,
-                               i, j))) next
+                               i, tolower(j)))) next
       
       isimip_files = list.files(file.path(folder_root, folder_isimip_root,
-                                          i, j))
+                                          i, tolower(j)))
       if(length(grep(".txt", isimip_files)) == 0L){
-        unzip_isimip(file.path(folder_root, folder_isimip_root, i, j))
+        unzip_isimip(file.path(folder_root, folder_isimip_root, i, tolower(j)))
       }
     }
   }
@@ -56,11 +56,11 @@ for(i in lakes){
       }
       
       files_to_copy = list.files(file.path(folder_root, folder_isimip_root,
-                                           k, j), pattern = ".txt")
+                                           k, tolower(j)), pattern = ".txt")
       files_to_copy = files_to_copy[grepl(tolower(i), files_to_copy)]
       
       file.copy(from = file.path(folder_root, folder_isimip_root,
-                                 k, j, files_to_copy),
+                                 k, tolower(j), files_to_copy),
                 the_folder, overwrite = TRUE)
     }
   }
