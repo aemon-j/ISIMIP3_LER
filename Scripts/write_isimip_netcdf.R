@@ -12,7 +12,7 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
   ndays = as.numeric(difftime(time, ref_time, units = "days"))
   
   # Define lon and lat dimensions
-  lon1 = ncdim_def("lon", "degrees_east", vals = as.double(180 - lon))
+  lon1 = ncdim_def("lon", "degrees_east", vals = as.double(ifelse(longitude >= 0, longitude, longitude + 360)))
   lat2 = ncdim_def("lat", "degrees_north", vals = as.double(lat))
   
   # Time dimension
