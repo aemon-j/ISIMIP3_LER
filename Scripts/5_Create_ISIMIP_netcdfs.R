@@ -109,7 +109,7 @@ for(i in lakes){
                             lat = latitude, lon = longitude)
         
         ### Surface temperature - surftemp
-        df_surf_temp = df_model_temp[[1L]]
+        df_surf_temp = df_model_temp[[1L]] + 273.15
         
         var_name = "surftemp"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
@@ -121,7 +121,7 @@ for(i in lakes){
                             lat = latitude, lon = longitude)
         
         ### Bottom temperature - bottemp
-        df_bott_temp = df_model_temp[[last_col_non_na]]
+        df_bott_temp = df_model_temp[[last_col_non_na]] + 273.15
         
         var_name = "bottemp"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
@@ -159,6 +159,16 @@ for(i in lakes){
         ### Sensible heat flux (upward is positive) - sensheatf-total
         df_model_qh = -1 * df_qh[l, ]
         
+        if(modelname == "gotm-ler"){
+          # Information from Ana Ayala: the GOTM output has not been multiplied
+          # by the heat scale factor, even though this is used in the heat budget
+          heat_scale_factor = get_yaml_multiple(file.path(folder_root, folder_data, i,
+                                                          tolower(j), k, "GOTM", "gotm.yaml"),
+                                                key1 = "surface", key2 = "fluxes",
+                                                key3 = "heat", key4 = "scale_factor")
+          df_model_qh = df_model_qh * heat_scale_factor
+        }
+        
         var_name = "sensheatf-total"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
                              "_", tolower(i), "_daily_", year(time[1L]), "_",
@@ -170,7 +180,9 @@ for(i in lakes){
         
         ### Latent heat flux (upward is positive) - latentheatf
         df_model_qe = -1 * df_qe[l, ]
-        
+        if(modelname == "gotm-ler"){
+          df_model_qe = df_model_qe * heat_scale_factor
+        }
         var_name = "latentheatf"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
                              "_", tolower(i), "_daily_", year(time[1L]), "_",
