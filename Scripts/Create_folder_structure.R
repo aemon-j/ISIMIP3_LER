@@ -19,7 +19,7 @@ for(i in scens){
     isimip_files = list.files(file.path(folder_root, folder_isimip_calib_files))
     
     if(length(grep(".txt", isimip_files)) == 0L){
-      unzip_isimip(file.path(folder_root, folder_isimip_root, i))
+      unzip_isimip(file.path(folder_root, folder_isimip_root, i), only_certain_lakes = lakes)
     }
     
   }else{
@@ -30,7 +30,7 @@ for(i in scens){
       isimip_files = list.files(file.path(folder_root, folder_isimip_root,
                                           i, tolower(j)))
       if(length(grep(".txt", isimip_files)) == 0L){
-        unzip_isimip(file.path(folder_root, folder_isimip_root, i, tolower(j)))
+        unzip_isimip(file.path(folder_root, folder_isimip_root, i, tolower(j)), only_certain_lakes = lakes)
       }
     }
   }
