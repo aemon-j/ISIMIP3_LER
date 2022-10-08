@@ -14,23 +14,23 @@ invisible(sapply(loaded_packages, library, character.only = T))
 for(i in scens){
   if(i == "calibration"){
     # Different dataset for calibration
-    if(!dir.exists(file.path(folder_root, folder_isimip_calib_files))) next
+    if(!dir.exists(file.path(folder_root, folder_isimip_calib_files, calib_gcm))) next
     
-    isimip_files = list.files(file.path(folder_root, folder_isimip_calib_files))
+    isimip_files = list.files(file.path(folder_root, folder_isimip_calib_files, calib_gcm))
     
     if(length(grep(".txt", isimip_files)) == 0L){
-      unzip_isimip(file.path(folder_root, folder_isimip_root, i), only_certain_lakes = lakes)
+      unzip_isimip(file.path(folder_root, folder_isimip_root, i, calib_gcm), only_certain_lakes = lakes)
     }
     
   }else{
     for(j in gcms){
       if(!dir.exists(file.path(folder_root, folder_isimip_root,
-                               i, tolower(j)))) next
+                               i, j))) next
       
       isimip_files = list.files(file.path(folder_root, folder_isimip_root,
-                                          i, tolower(j)))
+                                          i, j))
       if(length(grep(".txt", isimip_files)) == 0L){
-        unzip_isimip(file.path(folder_root, folder_isimip_root, i, tolower(j)), only_certain_lakes = lakes)
+        unzip_isimip(file.path(folder_root, folder_isimip_root, i, j), only_certain_lakes = lakes)
       }
     }
   }
@@ -59,11 +59,11 @@ for(i in lakes){
       }
       
       files_to_copy = list.files(file.path(folder_root, folder_isimip_root,
-                                           k, tolower(j)), pattern = ".txt")
+                                           k, j), pattern = ".txt")
       files_to_copy = files_to_copy[grepl(tolower(i), files_to_copy)]
       
       file.copy(from = file.path(folder_root, folder_isimip_root,
-                                 k, tolower(j), files_to_copy),
+                                 k, j, files_to_copy),
                 the_folder, overwrite = TRUE)
     }
   }
@@ -75,12 +75,13 @@ for(i in lakes){
     if(!dir.exists(the_folder)){
       dir.create(the_folder, recursive = TRUE)
     }
-    files_to_copy = list.files(file.path(folder_root, folder_isimip_calib_files),
+    files_to_copy = list.files(file.path(folder_root, folder_isimip_calib_files,
+                                         calib_gcm),
                                pattern = ".txt")
     files_to_copy = files_to_copy[grepl(tolower(i), files_to_copy)]
     
     file.copy(from = file.path(folder_root, folder_isimip_calib_files,
-                               files_to_copy),
+                               calib_gcm, files_to_copy),
               the_folder, overwrite = TRUE)
   }
 }

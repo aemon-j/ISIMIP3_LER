@@ -2,7 +2,7 @@
 
 gcms = c("GFDL-ESM4", "IPSL-CM6A-LR", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
 calib_gcm = "GSWP3-W5E5"
-scens = c("historical", "piControl", "ssp126", "ssp370", "ssp585", "calibration")
+scens = c("historical", "picontrol", "ssp126", "ssp370", "ssp585", "calibration")
 lakes = c("Allequash-Lake", "Alqueva", "Annecy", "Annie", "Argyle", "Biel", 
           "Big-Muskellunge-Lake", "Black-Oak-Lake", "Bourget", "Burley-Griffin", 
           "Crystal-Bog", "Crystal-Lake", "Delavan", "Dickie-Lake", "Eagle-Lake", 
