@@ -1,7 +1,7 @@
 # This script initialises all the settings for the ISIMIP3-LakeEnsemblR project
 
 # Specify the folder structure here
-dir_name = dirname(rstudioapi::getActiveDocumentContext()$path)
+dir_name = getwd() # In Rstudio, this works better: dirname(rstudioapi::getActiveDocumentContext()$path)
 folder_root = file.path(dir_name, "..")
 
 folder_scripts = "Scripts"
