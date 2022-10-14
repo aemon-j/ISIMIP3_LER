@@ -20,7 +20,7 @@ unzip_isimip = function(folder, only_certain_lakes = NULL){
   if(.Platform$OS.type == "windows"){
     unzip_command = "tar -xf"
   }else{
-    unzip_command = "unzip"
+    unzip_command = "unzip -n"
   }
   
   setwd(folder)
