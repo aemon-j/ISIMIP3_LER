@@ -18,10 +18,7 @@ for(i in scens){
     
     isimip_files = list.files(file.path(folder_root, folder_isimip_calib_files, calib_gcm))
     
-    if(length(grep(".txt", isimip_files)) == 0L){
-      unzip_isimip(file.path(folder_root, folder_isimip_root, i, calib_gcm), only_certain_lakes = lakes)
-    }
-    
+    unzip_isimip(file.path(folder_root, folder_isimip_root, i, calib_gcm), only_certain_lakes = lakes)
   }else{
     for(j in gcms){
       if(!dir.exists(file.path(folder_root, folder_isimip_root,
@@ -29,9 +26,8 @@ for(i in scens){
       
       isimip_files = list.files(file.path(folder_root, folder_isimip_root,
                                           i, j))
-      if(length(grep(".txt", isimip_files)) == 0L){
-        unzip_isimip(file.path(folder_root, folder_isimip_root, i, j), only_certain_lakes = lakes)
-      }
+      
+      unzip_isimip(file.path(folder_root, folder_isimip_root, i, j), only_certain_lakes = lakes)
     }
   }
 }
