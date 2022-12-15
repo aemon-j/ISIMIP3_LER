@@ -35,12 +35,26 @@ sim_tasks = divide_tasks_over_cores(sim_tasks, use_cores)
 
 use_cores = max(sim_tasks[, Core])
 
-###### Set up jobs -----
+###### Set up cores using the parallel package -----
+clust = makeCluster(use_cores)
+clusterExport(clust, varlist = list("sim_tasks", "run_model_on_core", "add_to_report",
+                                    "folder_root", "folder_data",
+                                    "models_to_run",
+                                    "folder_report", "report_name"),
+              envir = environment())
+clusterEvalQ(clust, expr = {library(LakeEnsemblR); library(data.table)})
+message("Running models in parallel... ", paste0("[", Sys.time(), "]"))
+parLapply(clust, seq_len(use_cores), function(core_job) do.call(run_model_on_core,
+                                                                args = list(sim_tasks, core_job)))
+stopCluster(clust)
+message("Model run complete!", paste0("[", Sys.time(), "]"))
 
-for(i in seq_len(use_cores)){
-  core_job = i
-  rstudioapi::jobRunScript(path = "run_model_on_core.R",
-                           importEnv = TRUE,
-                           name = paste0("job_", i))
-}
+# ###### Set up jobs -----
+# 
+# for(i in seq_len(use_cores)){
+#   core_job = i
+#   rstudioapi::jobRunScript(path = "run_model_on_core.R",
+#                            importEnv = TRUE,
+#                            name = paste0("job_", i))
+# }
 

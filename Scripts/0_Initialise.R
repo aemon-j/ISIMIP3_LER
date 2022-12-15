@@ -1,7 +1,7 @@
 # This script initialises all the settings for the ISIMIP3-LakeEnsemblR project
 
 # Specify the folder structure here
-dir_name = dirname(rstudioapi::getActiveDocumentContext()$path)
+dir_name = getwd() # In Rstudio, this works better: dirname(rstudioapi::getActiveDocumentContext()$path)
 folder_root = file.path(dir_name, "..")
 
 folder_scripts = "Scripts"
@@ -31,7 +31,7 @@ source("get_output_resolution.R")
 source("get_start_end_date.R")
 source("get_var_from_nc.R")
 source("merge_temp_obs.R")
-source("run_calib_on_core2.R")
+source("run_calib_on_core.R")
 source("temp_to_dens.R")
 source("unzip_isimip.R")
 source("write_isimip_netcdf.R")

@@ -1,6 +1,5 @@
 # Second step: calibrate the models
-# Use multiple cores with jobs
-# Using advice from: https://edwinth.github.io/blog/parallel-jobs/
+# Rewrite to use the parallel package instead of rstudio jobs
 
 # # Test
 # folder_test = "C:/Users/mesman/Documents/Projects/2021/ISIMIP3 - LakeEnsemblR/ISIMIP data/Annie/hadgem2-es/calibration"
@@ -31,16 +30,17 @@ cal_tasks = divide_tasks_over_cores(cal_tasks, use_cores)
 
 use_cores = max(cal_tasks[, Core])
 
-###### Set up jobs -----
-# Make sure to have one script that does the calibration
-# based on core_job and then it selects from cal_tasks
-# and picks the right folder
-# Also pass the workingDir that should be used
-
-for(i in seq_len(use_cores)){
-  core_job = i
-  rstudioapi::jobRunScript(path = "run_calib_on_core.R",
-                           importEnv = TRUE,
-                           name = paste0("job_", i))
-}
+###### Set up cores using the parallel package -----
+clust = makeCluster(use_cores)
+clusterExport(clust, varlist = list("cal_tasks", "run_calib_on_core", "add_to_report",
+                                    "folder_root", "folder_data", "calib_gcm",
+                                    "cal_iterations", "cmethod", "models_to_run",
+                                    "folder_report", "report_name"),
+                        envir = environment())
+clusterEvalQ(clust, expr = {library(LakeEnsemblR); library(data.table)})
+message("Calibrating models in parallel... ", paste0("[", Sys.time(), "]"))
+parLapply(clust, seq_len(use_cores), function(core_job) do.call(run_calib_on_core,
+                                                                args = list(cal_tasks, core_job)))
+stopCluster(clust)
+message("Calibration complete!", paste0("[", Sys.time(), "]"))
 
