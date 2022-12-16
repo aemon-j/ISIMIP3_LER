@@ -1,6 +1,5 @@
-# Checking the LakeCharacteristics_orig.xlsx file and the Lake Characteristics folder
-# Corrects the characteristics file and writes it. Also renames Gosia's
-# folders to the names used in ISIMIP
+# Checking and correcting the LakeCharacteristics csv file
+# Using the ISIMIP3 Lake char file (downloaded 2022-12-15)
 
 library(data.table)
 
@@ -9,112 +8,103 @@ setwd(the_wd)
 
 lst_to_report = list()
 
-folder_lake_char = "../Lake characteristics"
-orig_characteristics_file = file.path(folder_lake_char, "LakeCharacteristics_orig.csv")
-
-# This is a vector of the files downloaded from the ISIMIP server, to know for sure what
-# lake names are used in isimip3. 
-downloaded_files = c("gswp3-w5e5_obsclim_allequash-lake.zip", "gswp3-w5e5_obsclim_alqueva.zip",
-                     "gswp3-w5e5_obsclim_annecy.zip", "gswp3-w5e5_obsclim_annie.zip",
-                     "gswp3-w5e5_obsclim_argyle.zip", "gswp3-w5e5_obsclim_biel.zip",
-                     "gswp3-w5e5_obsclim_big-muskellunge-lake.zip", "gswp3-w5e5_obsclim_black-oak-lake.zip",
-                     "gswp3-w5e5_obsclim_bourget.zip", "gswp3-w5e5_obsclim_burley-griffin.zip",
-                     "gswp3-w5e5_obsclim_crystal-bog.zip", "gswp3-w5e5_obsclim_crystal-lake.zip",
-                     "gswp3-w5e5_obsclim_delavan.zip", "gswp3-w5e5_obsclim_dickie-lake.zip",
-                     "gswp3-w5e5_obsclim_eagle-lake.zip", "gswp3-w5e5_obsclim_ekoln-basin-of-malaren.zip",
-                     "gswp3-w5e5_obsclim_erken.zip", "gswp3-w5e5_obsclim_esthwaite-water.zip",
-                     "gswp3-w5e5_obsclim_falling-creek-reservoir.zip", "gswp3-w5e5_obsclim_feeagh.zip",
-                     "gswp3-w5e5_obsclim_fish-lake.zip", "gswp3-w5e5_obsclim_geneva.zip",
-                     "gswp3-w5e5_obsclim_great-pond.zip", "gswp3-w5e5_obsclim_green-lake.zip",
-                     "gswp3-w5e5_obsclim_harp-lake.zip", "gswp3-w5e5_obsclim_kilpisjarvi.zip",
-                     "gswp3-w5e5_obsclim_kinneret.zip", "gswp3-w5e5_obsclim_kivu.zip",
-                     "gswp3-w5e5_obsclim_klicava.zip", "gswp3-w5e5_obsclim_kuivajarvi.zip",
-                     "gswp3-w5e5_obsclim_langtjern.zip", "gswp3-w5e5_obsclim_laramie-lake.zip",
-                     "gswp3-w5e5_obsclim_lower-zurich.zip", "gswp3-w5e5_obsclim_mendota.zip",
-                     "gswp3-w5e5_obsclim_monona.zip", "gswp3-w5e5_obsclim_mozaisk.zip",
-                     "gswp3-w5e5_obsclim_mt-bold.zip", "gswp3-w5e5_obsclim_mueggelsee.zip",
-                     "gswp3-w5e5_obsclim_neuchatel.zip", "gswp3-w5e5_obsclim_ngoring.zip",
-                     "gswp3-w5e5_obsclim_nohipalo-mustjarv.zip", "gswp3-w5e5_obsclim_nohipalo-valgejarv.zip",
-                     "gswp3-w5e5_obsclim_okauchee-lake.zip", "gswp3-w5e5_obsclim_paajarvi.zip",
-                     "gswp3-w5e5_obsclim_rappbode-reservoir.zip", "gswp3-w5e5_obsclim_rimov.zip",
-                     "gswp3-w5e5_obsclim_rotorua.zip", "gswp3-w5e5_obsclim_sammamish.zip",
-                     "gswp3-w5e5_obsclim_sau-reservoir.zip", "gswp3-w5e5_obsclim_sparkling-lake.zip",
-                     "gswp3-w5e5_obsclim_stechlin.zip", "gswp3-w5e5_obsclim_sunapee.zip",
-                     "gswp3-w5e5_obsclim_tahoe.zip", "gswp3-w5e5_obsclim_tarawera.zip",
-                     "gswp3-w5e5_obsclim_toolik-lake.zip", "gswp3-w5e5_obsclim_trout-bog.zip",
-                     "gswp3-w5e5_obsclim_trout-lake.zip", "gswp3-w5e5_obsclim_two-sisters-lake.zip",
-                     "gswp3-w5e5_obsclim_vendyurskoe.zip", "gswp3-w5e5_obsclim_victoria.zip",
-                     "gswp3-w5e5_obsclim_vortsjarv.zip", "gswp3-w5e5_obsclim_washington.zip",
-                     "gswp3-w5e5_obsclim_windermere.zip", "gswp3-w5e5_obsclim_wingra.zip",
-                     "gswp3-w5e5_obsclim_zlutice.zip")
-isimip_lakes = gsub("gswp3-w5e5_obsclim_|.zip", "", downloaded_files)
+folder_lake_char = "../LakeCharacteristics"
+orig_characteristics_file = file.path(folder_lake_char, "ISIMIP3_Lake_Sector_Contributions - MetaData Hydrothermal.csv")
 
 df_char = fread(orig_characteristics_file)
 
-# Underscores became hyphens
-df_char[, `Lake Name Folder` := gsub("_", "-", `Lake Name Folder`)]
+# Ensure that I have all the lake names correct, with at least these headers:
+# Lake Long,	Lake Short Name,	Lake Name Folder,	latitude (dec deg),	longitude (dec deg),
+#   elevation (m),	mean depth (m),	max depth (m)
 
-##### Check the names, and check if ISIMIP names are missing in the LakeCharacteristics file and vice versa -----
-names_in_df_char = tolower(df_char$`Lake Name Folder`)
+##### Remove lakes that are not included, and only keep relevant columns -----
+ind_to_remove = which(df_char$`Date of contribution (dd/mm/yyyy)` == "marked for deletion")
+df_char = df_char[1L:(ind_to_remove - 1L)]
+df_char = df_char[`Lake Name` != "", .(`Lake Name`,
+                                       `Lake Short Name`,
+                                       `Lake Name in file name (reporting)`,
+                                       `Reservoir or lake?`,
+                                       Country,
+                                       `latitude (dec deg)`,
+                                       `longitude (dec deg)`,
+                                       `elevation (m)`,
+                                       `mean depth (m)`,
+                                       `max depth (m)`,
+                                       `lake area (km²)`,
+                                       `Average Secchi disk depth [m]`,
+                                       `Light extinction coefficient [m-1]`)]
+setnames(df_char, old = "Lake Name in file name (reporting)", new = "Lake Name Folder")
 
-lst_to_report[["Lakes in LakeChar but not in ISIMIP"]] = names_in_df_char[!(names_in_df_char %in% isimip_lakes)]
-lst_to_report[["Lakes in ISIMIP but not in LakeChar"]] = isimip_lakes[!(isimip_lakes %in% names_in_df_char)]
+##### Dots instead of commas -----
+col_names = names(df_char)
+num_col_names = col_names[!(col_names %in% c("Lake Name", "Lake Short Name",
+                                             "Lake Name Folder",
+                                             "Reservoir or lake?", "Country"))]
 
-df_char = df_char[tolower(`Lake Name Folder`) %in% isimip_lakes]
+df_char[, (num_col_names) := lapply(.SD, function(x) gsub(",", ".", x)), .SDcols = num_col_names]
+df_char[, (num_col_names) := lapply(.SD, as.numeric), .SDcols = num_col_names]
 
-##### Check the names and formats of the folders in the lake characteristics folder -----
-# These folders were downloaded from Gosia's project on the server and
-# they contain the temperature observations and hypsographs
-lakes_with_hyps_and_obs = list.files(folder_lake_char)
-lakes_with_hyps_and_obs = lakes_with_hyps_and_obs[file.info(file.path(folder_lake_char, lakes_with_hyps_and_obs))$isdir]
+##### Remove double entries -----
+ind_dupl = which(duplicated(df_char$`Lake Name Folder`))
+df_char = df_char[-ind_dupl]
 
-# Incredible...
-tmp_names1 = gsub(" ", "", df_char$`Lake Short Name`)
-tmp_names2 = gsub("-", "", df_char$`Lake Name Folder`)
+##### Special character corrections -----
+# In general, use the 26-alfabet sign, based on the reporting name
+df_char[`Lake Name Folder` == "ekoln", `Lake Name` := "Ekoln basin of Malaren"]
+df_char[`Lake Name Folder` == "kilpisjarvi", `Lake Name` := "Kilpisjarvi"]
+df_char[`Lake Name Folder` == "mueggelsee", `:=`(`Lake Name` = "Lake Muggelsee",
+                                                 `Lake Short Name` = "Muggelsee")]
+df_char[`Lake Name Folder` == "neuchatel", `:=`(`Lake Name` = "Lake Neuchatel",
+                                                `Lake Short Name` = "Neuchatel")]
+df_char[`Lake Name Folder` == "nohipalo-mustjaerv", `:=`(`Lake Name` = "Lake Nohipalo Mustjaerv",
+                                                         `Lake Short Name` = "NohipaloMustjaerv")]
+df_char[`Lake Name Folder` == "nohipalo-valgejaerv", `:=`(`Lake Name` = "Lake Nohipalo Valgejaerv",
+                                                          `Lake Short Name` = "NohipaloValgejaerv")]
+df_char[`Lake Name Folder` == "paaijarvi", `:=`(`Lake Name` = "Lake Paaijarvi",
+                                                `Lake Short Name` = "Paajarvi")]
+df_char[`Lake Name Folder` == "vortsjaerv", `Lake Name` := "Lake Vortsjarv"]
+df_char[`Lake Name Folder` == "scharmutzelsee", `:=`(`Lake Name` = "Lake Scharmutzelsee",
+                                                     `Lake Short Name` = "Scharmutzelsee")]
 
-for(i in lakes_with_hyps_and_obs){
-  if(i %in% df_char$`Lake Short Name`){
-    real_name = df_char[i == `Lake Short Name`, `Lake Name Folder`]
-  }else if(i %in% tmp_names1){
-    ind = which(tmp_names1 == i)
-    real_name = df_char[ind, `Lake Name Folder`]
-  }else if(i %in% df_char$`Lake Name Folder`){
-    # No action is required, folder name is already correct
-    real_name = i
-  }else if(i %in% tmp_names2){
-    ind = which(tmp_names2 == i)
-    real_name = df_char[ind, `Lake Name Folder`]
-  }else if(i == "Muggelsee"){
-    real_name = "Mueggelsee"
-  }else{
-    message("Lake ", i, " unaccounted for!")
-  }
-  
-  hyps_file = list.files(file.path(folder_lake_char, i),
-                         pattern = "hypsometry.csv")
-  if(length(hyps_file) != 1L){
-    lst_to_report[["No hypsometry file"]] = c(lst_to_report[["No hypsometry file"]],
-                                              real_name)
-  }
-  
-  temp_files = list.files(file.path(folder_lake_char, i),
-                          pattern = "_temp_")
-  if(length(temp_files) == 0L){
-    lst_to_report[["No temp obs"]] = c(lst_to_report[["No temp obs"]],
-                                              real_name)
-  }
-  
-  the_folder = file.path(folder_lake_char, real_name)
-  file.rename(file.path(folder_lake_char, i),
-              the_folder)
+##### Filling in or correcting values -----
+# I need values for lat, lon, and elevation in order to run LER. Max depth could be used as well
+df_char[`Lake Name Folder` == "allequash", `elevation (m)` := 494] # Hanson et al. (2018). JAWRA, 54(6), 1302-1324
+df_char[`Lake Name Folder` == "annie", `max depth (m)` := 20.7] # Gaiser et al. (2009). Fundamental and Applied Limnology, 175(3), 217
+df_char[`Lake Name Folder` == "big-muskellunge", `elevation (m)` := 500] # Hanson et al. (2018). JAWRA, 54(6), 1302-1324
+df_char[`Lake Name Folder` == "black-oak", `Average Secchi disk depth [m]` := 3.2] # Original value 32.06, but notes say "min Secchi =3, max Secchi = 12"
+df_char[`Lake Name Folder` == "bryrup", `elevation (m)` := 66] # mapcarta.com
+df_char[`Lake Name Folder` == "crystal-lake", `elevation (m)` := 501] # Hanson et al. (2018). JAWRA, 54(6), 1302-1324
+df_char[`Lake Name Folder` == "crystal-bog", `elevation (m)` := 501.5] # Hanson et al. (2018). JAWRA, 54(6), 1302-1324
+df_char[`Lake Name Folder` == "eagle", `elevation (m)` := 190] # Oveisy and Boegman (2014). J. Limnol., 73(3) 441-453
+df_char[`Lake Name Folder` == "fish", `elevation (m)` := 265] # Rough estimate using Google Maps
+df_char[`Lake Name Folder` == "mendota", `elevation (m)` := 258.5] # Chen et al. (2019). Journal of Hydrology, 577, 123920
+df_char[`Lake Name Folder` == "monona", `elevation (m)` := 257] # Chen et al. (2019). Journal of Hydrology, 577, 123920
+df_char[`Lake Name Folder` == "sparkling", `elevation (m)` := 495] # Hanson et al. (2018). JAWRA, 54(6), 1302-1324
+df_char[`Lake Name Folder` == "toolik", `:=`(`elevation (m)` = 720,
+                                             `mean depth (m)` = 7,
+                                             `max depth (m)` = 25)] # O'Brien et al. (1997). The limnology of Toolik lake. In Freshwaters of Alaska (pp. 61-106). Springer, New York, NY.
+df_char[`Lake Name Folder` == "trout-lake", `elevation (m)` := 491.8] # Hanson et al. (2018). JAWRA, 54(6), 1302-1324
+df_char[`Lake Name Folder` == "trout-bog", `elevation (m)` := 495] # Hanson et al. (2018). JAWRA, 54(6), 1302-1324
+df_char[`Lake Name Folder` == "wingra", `elevation (m)` := 254] # Boylen et al. (1973). L&O, 18(4), 628-634
+
+##### Correcting file naming -----
+if(file.exists(file.path(folder_lake_char, "Monona", "Monona_hypsograph.csv"))){
+  file.rename(file.path(folder_lake_char, "Monona", "Monona_hypsograph.csv"),
+              file.path(folder_lake_char, "Monona", "Monona_hypsometry.csv"))
+}
+if(file.exists(file.path(folder_lake_char, "Bryrup", "Bryrup_wtemp_daily.csv"))){
+  file.rename(file.path(folder_lake_char, "Bryrup", "Bryrup_wtemp_daily.csv"),
+              file.path(folder_lake_char, "Bryrup", "Bryrup_temp_daily.csv"))
+}
+if(file.exists(file.path(folder_lake_char, "Murten", "Murten_Temp.csv"))){
+  file.rename(file.path(folder_lake_char, "Murten", "Murten_Temp.csv"),
+              file.path(folder_lake_char, "Murten", "Murten_temp_daily.csv"))
+}
+if(file.exists(file.path(folder_lake_char, "Zurich", "Zurich_Temp.csv"))){
+  file.rename(file.path(folder_lake_char, "Zurich", "Zurich_Temp.csv"),
+              file.path(folder_lake_char, "Zurich", "Zurich_temp_daily.csv"))
 }
 
-##### Last corrections  -----
-# Annie, based on Gaiser et al. (2009). Fundamental and Applied Limnology, 175(3), 217.
-df_char[`Lake Name Folder` == "Annie", `:=`(`mean depth (m)` = 10.0,
-                                            `max depth (m)` = 20.7)]
-
-file.rename(file.path(folder_lake_char, "Monona", "Monona_hypsograph.csv"),
-            file.path(folder_lake_char, "Monona", "Monona_hypsometry.csv"))
+##### Write file -----
 
 fwrite(df_char, file.path(folder_lake_char, "LakeCharacteristics.csv"))
