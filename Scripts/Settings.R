@@ -3,19 +3,19 @@
 gcms = c("GFDL-ESM4", "IPSL-CM6A-LR", "MPI-ESM1-2-HR", "MRI-ESM2-0", "UKESM1-0-LL")
 calib_gcm = "GSWP3-W5E5"
 scens = c("historical", "picontrol", "ssp126", "ssp370", "ssp585", "calibration")
-lakes = c("Allequash-Lake", "Alqueva", "Annecy", "Annie", "Argyle", "Biel", 
-          "Big-Muskellunge-Lake", "Black-Oak-Lake", "Bourget", "Burley-Griffin", 
-          "Crystal-Bog", "Crystal-Lake", "Delavan", "Dickie-Lake", "Eagle-Lake", 
-          "Ekoln-basin-of-Malaren", "Erken", "Esthwaite-Water", "Falling-Creek-Reservoir", 
-          "Feeagh", "Fish-Lake", "Geneva", "Great-Pond", "Green-Lake", 
-          "Harp-Lake", "Kilpisjarvi", "Kinneret", "Kivu", "Klicava", "Kuivajarvi", 
-          "Langtjern", "Laramie-Lake", "Lower-Zurich", "Mendota", "Monona", 
-          "Mozaisk", "Mt-Bold", "Mueggelsee", "Neuchatel", "Nohipalo-Mustjarv", 
-          "Nohipalo-Valgejarv", "Okauchee-Lake", "Paajarvi", "Rappbode-Reservoir", 
-          "Rimov", "Rotorua", "Sammamish", "Sau-Reservoir", "Sparkling-Lake", 
-          "Stechlin", "Sunapee", "Tahoe", "Tarawera", "Toolik-Lake", "Trout-Bog", 
-          "Trout-Lake", "Two-Sisters-Lake", "Washington", "Vendyurskoe", 
-          "Windermere", "Wingra", "Vortsjarv", "Zlutice")
+lakes = c("Allequash", "Alqueva", "Annie", "Arendsee", "Argyle", "Biel", 
+          "BigMuskellunge", "BlackOak", "Bosumtwi", "Bryrup", "BurleyGriffin", 
+          "Chao", "Crystal", "CrystalBog", "Delavan", "Dickie", "Eagle", 
+          "Ekoln", "Erken", "EsthwaiteWater", "FallingCreek", "Feeagh", 
+          "Fish", "GreatPond", "Green", "Harp", "Hassel", "Hulun", "Kilpisjarvi", 
+          "Kinneret", "Kivu", "Klicava", "Kuivajarvi", "Langtjern", "Laramie", 
+          "LowerLakeZurich", "Mendota", "Monona", "Mozhaysk", "MtBold", 
+          "Muggelsee", "Murten", "Neuchatel", "Ngoring", "NohipaloMustjarv", 
+          "NohipaloValgejarv", "Okauchee", "Paajarvi", "Rappbode", "Rappbodep", 
+          "Rimov", "Rotorua", "Sammamish", "Sau", "Scharmutzel", "Sparkling", 
+          "Stechlin", "Sunapee", "Tahoe", "Taihu", "Tarawera", "Thun", 
+          "Toolik", "Trout", "TroutBog", "TwoSisters", "Vendyurskoe", "Vortsjarv", 
+          "Washington", "Windermere", "Wingra", "Zlutice", "Zurich")
 models_to_run = c("FLake", "GLM", "GOTM", "Simstrat")
 
 
@@ -32,8 +32,8 @@ report_name = "Test"
 
 ##### Calibration settings -----
 
-frac_of_cores = 0.75 # Fraction of available cores to use, rounded up. 
-cal_iterations = 150
+frac_of_cores = 1.0 # Fraction of available cores to use, rounded up. 
+cal_iterations = 2000
 cmethod = "LHC" # Calibration method to use, see ?cali_ensemble
 
 #### IMPORTANT!!!!!

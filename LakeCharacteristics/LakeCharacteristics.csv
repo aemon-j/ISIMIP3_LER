@@ -8,7 +8,7 @@ Big Muskellunge Lake,BigMuskellunge,big-muskellunge,lake,USA,46.02,-89.61,500,7.
 Black Oak Lake,BlackOak,black-oak,lake,USA,46.16,-89.32,521.51,10.36,25.91,2.28,3.2,
 Lake Burley Griffin,BurleyGriffin,burley-griffin,reservoir,Australia,-35.3,149.07,556,5,17,6.64,1.4,
 Crystal Lake,Crystal,crystal-lake,lake,USA,46,-89.61,501,10.4,20.4,0.38,7.5,
-Crystal Bog,Crystal Bog,crystal-bog,lake,USA,46.01,-89.61,501.5,1.7,2.5,0.01,1.5,
+Crystal Bog,CrystalBog,crystal-bog,lake,USA,46.01,-89.61,501.5,1.7,2.5,0.01,1.5,
 Delavan Lake,Delavan,delavan,lake,USA,42.61,-88.6,282.55,7.61,16.46,6.96,3.53,
 Dickie Lake,Dickie,dickie,lake,Canada,45.15,-79.09,341,5,12,0.94,3.08,
 Eagle Lake,Eagle,eagle,lake,Canada,44.68,-76.7,190,10.1,31.1,6.65,4.62,
@@ -36,8 +36,8 @@ Mt Bold,MtBold,mt-bold,reservoir,Australia,-35.12,138.71,242.9,13,45.4,3.08,1.24
 Lake Muggelsee,Muggelsee,mueggelsee,lake,Germany,52.43,13.65,32.3,4.9,7.7,7.4,2,1.48
 Lake Neuchatel,Neuchatel,neuchatel,lake,Switzerland,46.54,6.52,429,64,152,217,,0.25
 Ngoring,Ngoring,ngoring,lake,China,34.9,97.7,4300,17.6,30.7,611,,0.3
-Lake Nohipalo Mustjaerv,NohipaloMustjaerv,nohipalo-mustjaerv,lake,Estonia,57.93,27.34,61,3.9,8.9,0.22,0.46,
-Lake Nohipalo Valgejaerv,NohipaloValgejaerv,nohipalo-valgejaerv,lake,Estonia,57.94,27.35,62,6.2,12.5,0.07,4.52,
+Lake Nohipalo Mustjaerv,NohipaloMustjarv,nohipalo-mustjaerv,lake,Estonia,57.93,27.34,61,3.9,8.9,0.22,0.46,
+Lake Nohipalo Valgejaerv,NohipaloValgejarv,nohipalo-valgejaerv,lake,Estonia,57.94,27.35,62,6.2,12.5,0.07,4.52,
 Okauchee Lake,Okauchee,okauchee,lake,USA,43.13,-88.43,269,7.62,28.65,4.9,6.94,
 Lake Paaijarvi,Paajarvi,paaijarvi,lake,Finland,61.07,25.13,102,15,85,13.44,2.2,1.15
 Rappbode Reservoir,Rappbode,rappbode,reservoir,Germany,51.74,10.89,415,28.6,89,3.95,4.8,0.25
@@ -52,7 +52,7 @@ Lake Tahoe,Tahoe,tahoe,reservoir,USA,39.09,-120.03,1897,304.8,501,490,19.9,
 Lake Tarawera,Tarawera,tarawera,lake,New Zealand,-38.21,176.43,300,50,87.5,41.3,8.34,0.18
 Toolik Lake,Toolik,toolik,lake,USA,68.63,-149.6,720,7,25,,4.6,
 Trout Lake,Trout,trout-lake,lake,USA,46.03,-89.67,491.8,14.6,35.7,15.65,4.7,
-Trout Bog,Trout Bog,trout-bog,lake,USA,46.04,-89.69,495,5.6,7.9,0,1.1,
+Trout Bog,TroutBog,trout-bog,lake,USA,46.04,-89.69,495,5.6,7.9,0,1.1,
 Two Sisters Lake,TwoSisters,two-sisters,lake,USA,45.77,-89.53,481,9.14,19.2,2.91,17.75,
 Lake Vortsjarv,Vortsjarv,vortsjaerv,lake,Estonia,58.31,26.01,33,2.8,6,270,0.86,2.76
 Lake Washington,Washington,washington,lake,USA,47.64,-122.27,5,33,65.2,87.6,5.3,
@@ -65,7 +65,7 @@ Lake Hulun,Hulun,hulun,lake,China,49,117.39,545.6,5.75,8,2339,0.35,
 Rappbode Predam,Rappbodep,rappbodep,reservoir,Germany,51.71,10.8,533,5.3,16,0.24,2.26,
 Hassel Predam,Hassel,hassel,reservoir,Germany,51.71,10.83,504,5,14,0.26,2.15,
 Lake Arendsee,Arendsee,arendsee,lake,Germany,52.89,11.47,23,28.8,49,5.11,2.89,
-Lake Scharmutzelsee,Scharmutzelsee,scharmutzelsee,lake,Germany,52.25,14.05,38.3,8.8,29,12.1,2,
+Lake Scharmutzelsee,Scharmutzel,scharmutzelsee,lake,Germany,52.25,14.05,38.3,8.8,29,12.1,2,
 Lake Zurich,Zurich,zurich,lake,Switzerland,47.28,8.6,406,51,136,68.2,5.04,
 Lake Thun,Thun,thun,lake,Switzerland,46.7,7.7,558,136,212,48.3,8.05,
 Lake Murten,Murten,murten,lake,Switzerland,46.93,7.08,429,22,45,22.8,3.49,

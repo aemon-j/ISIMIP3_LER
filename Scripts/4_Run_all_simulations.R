@@ -30,6 +30,9 @@ setorder(sim_tasks, Lakes, GCM)
 
 all_cores = detectCores()
 use_cores = ceiling(all_cores * frac_of_cores)
+if(use_cores == all_cores){
+  use_cores = all_cores - 1
+}
 
 sim_tasks = divide_tasks_over_cores(sim_tasks, use_cores)
 

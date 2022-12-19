@@ -8,7 +8,7 @@ progressBar = txtProgressBar(min = 0, max = length(lakes), initial = 0)
 progress = 0
 
 for(i in lakes){
-  the_lake_folder = file.path(folder_root, folder_data, i)
+  the_lake_folder = file.path(folder_root, folder_lakechar, i)
   
   if(!dir.exists(the_lake_folder)){
     next
@@ -52,18 +52,31 @@ for(i in lakes){
   df_obs[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
   
   ##### Select depth resolution of output -----
+  df_char = fread(file.path(folder_root, folder_lakechar, "LakeCharacteristics.csv"))
   
-  max_depth = df_hyps[, max(Depth_meter)]
+  max_depth = max(df_hyps[, max(Depth_meter)], df_char[`Lake Short Name` == i, `max depth (m)`], na.rm = T)
   
   # Get output resolution based on max_depth
   output_res = get_output_resolution(max_depth)
   
+  ##### Get light extinction -----
+  secchi_d = df_char[`Lake Short Name` == i, `Average Secchi disk depth [m]`]
+  kw = df_char[`Lake Short Name` == i, `Light extinction coefficient [m-1]`]
+  
+  if(!is.na(kw)){
+    extinc_coef = kw
+  }else if(!is.na(secchi_d)){
+    # Koenings and Edmundson (1991). doi:10.4319/lo.1991.36.1.0091
+    extinc_coef = 1.7 / secchi_d
+  }else{
+    # Default is Hakanson function (Aquatic Sciences, 1995)
+    extinc_coef = round(1.1925 * max_depth^(-0.424), 3L)
+  }
+  
   ##### Read elevation -----
-  # Elevation: read from document created in Raman-Vinna's project
-  df_char = fread(file.path(folder_root, folder_other, "LakeCharacteristics.csv"))
-  elev = df_char[`Lake Name Folder` == i, `elevation (m)`]
-  latitude = df_char[`Lake Name Folder` == i, `latitude (dec deg)`]
-  longitude = df_char[`Lake Name Folder` == i, `longitude (dec deg)`]
+  elev = df_char[`Lake Short Name` == i, `elevation (m)`]
+  latitude = df_char[`Lake Short Name` == i, `latitude (dec deg)`]
+  longitude = df_char[`Lake Short Name` == i, `longitude (dec deg)`]
   
   for(j in c(gcms, calib_gcm)){
     for(k in scens){
@@ -89,7 +102,6 @@ for(i in lakes){
       if(k == "calibration"){
         fwrite(df_obs, file.path(the_folder, "obs_wtemp.csv"))
       }
-      
       
       ##### LER configuration file -----
       # Standard settings are supposed to be correct in the LakeEnsemblR.yaml configuration file
@@ -137,8 +149,6 @@ for(i in lakes){
                           key1 = "output", key2 = "depths", value = output_res, verbose = F)
       
       ### Light
-      # Default is Hakanson function (Aquatic Sciences, 1995)
-      extinc_coef = round(1.1925 * max_depth^(-0.424), 3L)
       input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
                           key1 = "input", key2 = "light", key3 = "Kw", value = extinc_coef, verbose = F)
       
