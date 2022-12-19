@@ -24,7 +24,7 @@ for(i in lakes){
   
   ##### Read wtemp observations -----
   obs_files = list.files(the_lake_folder)
-  obs_files = obs_files[grepl("_temp_", obs_files)]
+  obs_files = obs_files[grepl("temp_", obs_files)]
   
   if(any(grepl("_daily", obs_files))){
     obs_files = obs_files[grepl("_daily", obs_files)][1]
