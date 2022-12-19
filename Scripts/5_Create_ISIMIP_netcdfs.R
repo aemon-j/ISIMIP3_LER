@@ -10,7 +10,12 @@
 load("my_environment.RData")
 invisible(sapply(loaded_packages, library, character.only = T))
 
+df_char = fread(file.path(folder_root, folder_lakechar, "LakeCharacteristics.csv"))
+name_couples = df_char[, .(`Lake Short Name`, `Lake Name Folder`)]
+
 for(i in lakes){
+  lake_report_name = name_couples[`Lake Short Name` == i, `Lake Name Folder`]
+  
   for(j in gcms){
     for(k in scens[scens != "calibration"]){
       latitude = get_yaml_multiple(file.path(folder_root, folder_data, i, tolower(j), k, "LakeEnsemblR.yaml"),
@@ -64,7 +69,7 @@ for(i in lakes){
         # The bias_adjustment seems to be described in the 
         # ISIMIP3b bias adjustment fact sheet by Lange (2021)
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         
         if(!dir.exists(file.path(folder_root, folder_out))){
@@ -83,7 +88,7 @@ for(i in lakes){
                                  1L, 0L)
         var_name = "strat"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         write_isimip_netcdf(df_model_strat, time, var_name = var_name,
                             var_unit = "1",
@@ -101,7 +106,7 @@ for(i in lakes){
         
         var_name = "thermodepth"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         write_isimip_netcdf(df_thermo_depth, time, var_name = var_name,
                             var_unit = "m",
@@ -113,7 +118,7 @@ for(i in lakes){
         
         var_name = "surftemp"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         write_isimip_netcdf(df_surf_temp, time, var_name = var_name,
                             var_unit = "K",
@@ -125,7 +130,7 @@ for(i in lakes){
         
         var_name = "bottemp"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         write_isimip_netcdf(df_bott_temp, time, var_name = var_name,
                             var_unit = "K",
@@ -137,7 +142,7 @@ for(i in lakes){
         
         var_name = "icethick"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         write_isimip_netcdf(df_model_icethick, time, var_name = var_name,
                             var_unit = "m",
@@ -149,7 +154,7 @@ for(i in lakes){
         
         var_name = "ice"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         write_isimip_netcdf(df_model_icepresence, time, var_name = var_name,
                             var_unit = "1",
@@ -171,7 +176,7 @@ for(i in lakes){
         
         var_name = "sensheatf-total"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         write_isimip_netcdf(df_model_qh, time, var_name = var_name,
                             var_unit = "W m-2",
@@ -185,7 +190,7 @@ for(i in lakes){
         }
         var_name = "latentheatf"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
-                             "_", tolower(i), "_daily_", year(time[1L]), "_",
+                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
                              year(time[length(time)]), ".nc")
         write_isimip_netcdf(df_model_qe, time, var_name = var_name,
                             var_unit = "W m-2",

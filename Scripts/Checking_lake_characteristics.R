@@ -50,6 +50,7 @@ df_char = df_char[-ind_dupl]
 
 ##### Special character corrections -----
 # In general, use the 26-alfabet sign, based on the reporting name
+df_char[`Lake Name Folder` == "crystal-bog", `Lake Short Name` := "CrystalBog"]
 df_char[`Lake Name Folder` == "ekoln", `Lake Name` := "Ekoln basin of Malaren"]
 df_char[`Lake Name Folder` == "kilpisjarvi", `Lake Name` := "Kilpisjarvi"]
 df_char[`Lake Name Folder` == "mueggelsee", `:=`(`Lake Name` = "Lake Muggelsee",
@@ -57,14 +58,15 @@ df_char[`Lake Name Folder` == "mueggelsee", `:=`(`Lake Name` = "Lake Muggelsee",
 df_char[`Lake Name Folder` == "neuchatel", `:=`(`Lake Name` = "Lake Neuchatel",
                                                 `Lake Short Name` = "Neuchatel")]
 df_char[`Lake Name Folder` == "nohipalo-mustjaerv", `:=`(`Lake Name` = "Lake Nohipalo Mustjaerv",
-                                                         `Lake Short Name` = "NohipaloMustjaerv")]
+                                                         `Lake Short Name` = "NohipaloMustjarv")]
 df_char[`Lake Name Folder` == "nohipalo-valgejaerv", `:=`(`Lake Name` = "Lake Nohipalo Valgejaerv",
-                                                          `Lake Short Name` = "NohipaloValgejaerv")]
+                                                          `Lake Short Name` = "NohipaloValgejarv")]
 df_char[`Lake Name Folder` == "paaijarvi", `:=`(`Lake Name` = "Lake Paaijarvi",
                                                 `Lake Short Name` = "Paajarvi")]
+df_char[`Lake Name Folder` == "trout-bog", `Lake Short Name` := "TroutBog"]
 df_char[`Lake Name Folder` == "vortsjaerv", `Lake Name` := "Lake Vortsjarv"]
 df_char[`Lake Name Folder` == "scharmutzelsee", `:=`(`Lake Name` = "Lake Scharmutzelsee",
-                                                     `Lake Short Name` = "Scharmutzelsee")]
+                                                     `Lake Short Name` = "Scharmutzel")]
 
 ##### Filling in or correcting values -----
 # I need values for lat, lon, and elevation in order to run LER. Max depth could be used as well

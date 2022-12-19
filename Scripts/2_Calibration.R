@@ -25,6 +25,9 @@ cal_tasks = cal_tasks[Data == 1L]
 ###### Divide the tasks over the available cores -----
 all_cores = detectCores()
 use_cores = ceiling(all_cores * frac_of_cores)
+if(use_cores == all_cores){
+  use_cores = all_cores - 1
+}
 
 cal_tasks = divide_tasks_over_cores(cal_tasks, use_cores)
 
