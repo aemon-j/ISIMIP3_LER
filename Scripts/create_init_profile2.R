@@ -39,10 +39,9 @@ create_init_profile2 = function(df_obs, start_date = "2001-01-01", margin_time =
   }
   
   # Create average profile and put in LER format
-  df_av_prof = df_obs[, mean(Water_Temperature_celsius), by = Depth_meter]
+  df_av_prof = df_obs[, mean(Water_Temperature_celsius, na.rm = T), by = Depth_meter]
   setnames(df_av_prof, old = "V1", new = "Water_Temperature_celsius")
   setorder(df_av_prof, Depth_meter)
-  
   
   df_av_prof
 }
