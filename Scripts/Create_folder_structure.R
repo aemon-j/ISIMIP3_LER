@@ -10,43 +10,12 @@
 load("my_environment.RData")
 invisible(sapply(loaded_packages, library, character.only = T))
 
-# Unzip all the nc files, if not already done so
 df_char = fread(file.path(folder_root, folder_lakechar, "LakeCharacteristics.csv"))
 name_couples = df_char[`Lake Short Name` %in% lakes, .(`Lake Short Name`, `Lake Name Folder`)]
-
-for(i in scens){
-  if(i == "calibration"){
-    # Different dataset for calibration
-    if(!dir.exists(file.path(folder_root, folder_isimip_calib_files, calib_gcm))) next
-    
-    isimip_files = list.files(file.path(folder_root, folder_isimip_calib_files, calib_gcm))
-    
-    unzip_isimip(file.path(folder_root, folder_isimip_root, i, calib_gcm), only_certain_lakes = name_couples$`Lake Name Folder`)
-  }else{
-    for(j in gcms){
-      if(!dir.exists(file.path(folder_root, folder_isimip_root,
-                               i, j))) next
-      
-      isimip_files = list.files(file.path(folder_root, folder_isimip_root,
-                                          i, j))
-      
-      unzip_isimip(file.path(folder_root, folder_isimip_root, i, j), only_certain_lakes = name_couples$`Lake Name Folder`)
-    }
-  }
-}
 
 # Create folder structure and copy files
 for(i in lakes){
   lake_report = name_couples[`Lake Short Name` == i, `Lake Name Folder`]
-  
-  # If there are no data for this lake on the portal, skip
-  filename = paste(tolower(gcms[1]), "r1i1p1f1_w5e5",
-                   scens[1], "hurs", lake_report, "daily.txt", sep = "_")
-  if(!file.exists(file.path(folder_root, folder_isimip_root,
-                            scens[1], gcms[1], filename))){
-    warning("No data found for lake ", i)
-    next
-  }
   
   for(j in gcms){
     for(k in scens){
@@ -60,8 +29,7 @@ for(i in lakes){
       }
       
       files_to_copy = list.files(file.path(folder_root, folder_isimip_root,
-                                           k, j), pattern = ".txt")
-      files_to_copy = files_to_copy[grepl(lake_report, files_to_copy)]
+                                           k, j), pattern = paste0("_", lake_report))
       
       file.copy(from = file.path(folder_root, folder_isimip_root,
                                  k, j, files_to_copy),
@@ -78,8 +46,7 @@ for(i in lakes){
     }
     files_to_copy = list.files(file.path(folder_root, folder_isimip_calib_files,
                                          calib_gcm),
-                               pattern = ".txt")
-    files_to_copy = files_to_copy[grepl(lake_report, files_to_copy)]
+                               pattern = paste0("_", lake_report))
     
     file.copy(from = file.path(folder_root, folder_isimip_calib_files,
                                calib_gcm, files_to_copy),
