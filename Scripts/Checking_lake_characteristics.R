@@ -89,7 +89,7 @@ df_char[`Lake Name Folder` == "trout-lake", `elevation (m)` := 491.8] # Hanson e
 df_char[`Lake Name Folder` == "trout-bog", `elevation (m)` := 495] # Hanson et al. (2018). JAWRA, 54(6), 1302-1324
 df_char[`Lake Name Folder` == "wingra", `elevation (m)` := 254] # Boylen et al. (1973). L&O, 18(4), 628-634
 
-##### Correcting file naming -----
+##### Correcting file naming and other mistakes -----
 if(file.exists(file.path(folder_lake_char, "Monona", "Monona_hypsograph.csv"))){
   file.rename(file.path(folder_lake_char, "Monona", "Monona_hypsograph.csv"),
               file.path(folder_lake_char, "Monona", "Monona_hypsometry.csv"))
@@ -106,6 +106,11 @@ if(file.exists(file.path(folder_lake_char, "Zurich", "Zurich_Temp.csv"))){
   file.rename(file.path(folder_lake_char, "Zurich", "Zurich_Temp.csv"),
               file.path(folder_lake_char, "Zurich", "Zurich_temp_daily.csv"))
 }
+
+# Mistakes in Zurich's headers
+df_temp_zurich = fread(file.path(folder_lake_char, "Zurich", "Zurich_temp_daily.csv"))
+setnames(df_temp_zurich, c("SITE_ID", "SITE_NAME", "TIMESTAMP", "DEPTH", "WTEMP"))
+fwrite(df_temp_zurich, file.path(folder_lake_char, "Zurich", "Zurich_temp_daily.csv"))
 
 ##### Write file -----
 
