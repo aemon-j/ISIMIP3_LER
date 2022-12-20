@@ -132,5 +132,18 @@ if("ELEVATION_M" %in% names(df_hyps_zlutice)){
 }
 fwrite(df_hyps_zlutice, file.path(folder_lake_char, "Zlutice", "Zlutice_hypsometry.csv"))
 
+# Zlutice temp obs has an extra column
+df_temp_zlutice = fread(file.path(folder_lake_char, "Zlutice", "Zlutice_temp_daily.csv"))
+if("ELEVATION_M" %in% names(df_temp_zlutice)){
+  df_temp_zlutice[, ELEVATION_M := NULL]
+}
+fwrite(df_temp_zlutice, file.path(folder_lake_char, "Zlutice", "Zlutice_temp_daily.csv"))
+
+# Tarawera has some observations in an odd format - only six digits in TIMESTAMP
+df_temp_tarawera = fread(file.path(folder_lake_char, "Tarawera", "Tarawera_temp_daily.csv"))
+df_temp_tarawera = df_temp_tarawera[floor(log10(TIMESTAMP)) + 1 > 6L]
+fwrite(df_temp_tarawera, file.path(folder_lake_char, "Tarawera", "Tarawera_temp_daily.csv"))
+
+
 ##### Write file -----
 fwrite(df_char, file.path(folder_lake_char, "LakeCharacteristics.csv"))
