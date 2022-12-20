@@ -160,10 +160,17 @@ for(i in lakes){
       
       ##### Initial temperature profile -----
       df_init = create_init_profile2(df_obs, start_date = start_end_dates[1])
+      if(nrow(df_init) == 0L){
+        df_init = create_init_profile2(df_obs, start_date = start_end_dates[1],
+                                       margin_time = months(3))
+      }
+      if(nrow(df_init) == 0L){
+        df_init = create_init_profile2(df_obs, start_date = start_end_dates[1],
+                                       margin_time = months(5))
+      }
       df_init = df_init[Depth_meter <= max_depth]
       
       fwrite(df_init, file.path(the_folder, "init_temp_prof.csv"))
-      
       
       ##### Spin-up -----
       if(spin_up_period > 0L){
