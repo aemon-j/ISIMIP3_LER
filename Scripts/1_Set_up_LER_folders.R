@@ -33,6 +33,7 @@ for(i in lakes){
   if(length(obs_files) > 1L){
     df_obs = merge_temp_obs(obs_files, folder = the_lake_folder)
     df_obs = df_obs[, -(1:3)]
+    df_obs = df_obs[complete.cases(df_obs)]
     strmatch = str_match(df_obs[, TIMESTAMP_END], "(\\d{4})(\\d{2})(\\d{2})(\\d{2})(\\d{2})")
     df_obs[, TIMESTAMP_END := paste0(strmatch[,2], "-", strmatch[,3], "-", strmatch[,4], " ",
                                      strmatch[,5], ":", strmatch[,6], ":00")]
@@ -43,6 +44,7 @@ for(i in lakes){
   }else{
     df_obs = fread(file.path(the_lake_folder, obs_files))
     df_obs = df_obs[, -(1:2)]
+    df_obs = df_obs[complete.cases(df_obs)]
     strmatch = str_match(df_obs[, TIMESTAMP], "(\\d{4})(\\d{2})(\\d{2})")
     df_obs[, TIMESTAMP := paste0(strmatch[,2], "-", strmatch[,3], "-", strmatch[,4], " ",
                                  "00:00:00")]
@@ -169,6 +171,12 @@ for(i in lakes){
                                        margin_time = months(5))
       }
       df_init = df_init[Depth_meter <= max_depth]
+      
+      # Some lakes only have surface measurements - assume fully mixed lake
+      if(nrow(df_init) == 1L){
+        df_init = rbindlist(list(df_init, df_init, df_init))
+        df_init[, Depth_meter := c(0.0, round(max_depth / 2, 2L), max_depth)]
+      }
       
       fwrite(df_init, file.path(the_folder, "init_temp_prof.csv"))
       
