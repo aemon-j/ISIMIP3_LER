@@ -102,6 +102,10 @@ if(file.exists(file.path(folder_lake_char, "Murten", "Murten_Temp.csv"))){
   file.rename(file.path(folder_lake_char, "Murten", "Murten_Temp.csv"),
               file.path(folder_lake_char, "Murten", "Murten_temp_daily.csv"))
 }
+if(file.exists(file.path(folder_lake_char, "Wingra", "Wingra_hypsography.csv"))){
+  file.rename(file.path(folder_lake_char, "Wingra", "Wingra_hypsography.csv"),
+              file.path(folder_lake_char, "Wingra", "Wingra_hypsometry.csv"))
+}
 if(file.exists(file.path(folder_lake_char, "Zurich", "Zurich_Temp.csv"))){
   file.rename(file.path(folder_lake_char, "Zurich", "Zurich_Temp.csv"),
               file.path(folder_lake_char, "Zurich", "Zurich_temp_daily.csv"))
@@ -112,6 +116,21 @@ df_temp_zurich = fread(file.path(folder_lake_char, "Zurich", "Zurich_temp_daily.
 setnames(df_temp_zurich, c("SITE_ID", "SITE_NAME", "TIMESTAMP", "DEPTH", "WTEMP"))
 fwrite(df_temp_zurich, file.path(folder_lake_char, "Zurich", "Zurich_temp_daily.csv"))
 
-##### Write file -----
+if(file.exists(file.path(folder_lake_char, "Crystal", "Crystal_hypsography.csv"))){
+  file.rename(file.path(folder_lake_char, "Crystal", "Crystal_hypsography.csv"),
+              file.path(folder_lake_char, "Crystal", "Crystal_hypsometry.csv"))
+}
+# Mistake in Crystal's headers
+df_hyps_crystal = fread(file.path(folder_lake_char, "Crystal", "Crystal_hypsometry.csv"))
+setnames(df_hyps_crystal, gsub("-", "_", names(df_hyps_crystal)))
+fwrite(df_hyps_crystal, file.path(folder_lake_char, "Crystal", "Crystal_hypsometry.csv"))
 
+# Zlutice hypsograph has an extra column
+df_hyps_zlutice = fread(file.path(folder_lake_char, "Zlutice", "Zlutice_hypsometry.csv"))
+if("ELEVATION_M" %in% names(df_hyps_zlutice)){
+  df_hyps_zlutice[, ELEVATION_M := NULL]
+}
+fwrite(df_hyps_zlutice, file.path(folder_lake_char, "Zlutice", "Zlutice_hypsometry.csv"))
+
+##### Write file -----
 fwrite(df_char, file.path(folder_lake_char, "LakeCharacteristics.csv"))
