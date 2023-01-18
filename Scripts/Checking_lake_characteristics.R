@@ -144,6 +144,35 @@ df_temp_tarawera = fread(file.path(folder_lake_char, "Tarawera", "Tarawera_temp_
 df_temp_tarawera = df_temp_tarawera[floor(log10(TIMESTAMP)) + 1 > 6L]
 fwrite(df_temp_tarawera, file.path(folder_lake_char, "Tarawera", "Tarawera_temp_daily.csv"))
 
+# Hypsograph of Taihu is upside down
+df_hyps_taihu = fread(file.path(folder_lake_char, "Taihu", "Taihu_hypsometry.csv"))
+if(df_hyps_taihu[1L, DEPTH] == 0.0 & df_hyps_taihu[1L, BATHYMETRY_AREA] == 0.0){
+  df_hyps_taihu[, BATHYMETRY_AREA := rev(BATHYMETRY_AREA)]
+}
+fwrite(df_hyps_taihu, file.path(folder_lake_char, "Taihu", "Taihu_hypsometry.csv"))
+
+# Hypsographs of Hulun and MtBold do not contain a depth 0, causing Simstrat to crash
+df_hyps_mtbold = fread(file.path(folder_lake_char, "MtBold", "MtBold_hypsometry.csv"))
+if(df_hyps_mtbold[1L, DEPTH] != 0.0 & df_hyps_mtbold[1L, DEPTH] == min(df_hyps_mtbold[, DEPTH])){
+  df_hyps_mtbold[1L, DEPTH := 0.0]
+}
+fwrite(df_hyps_mtbold, file.path(folder_lake_char, "MtBold", "MtBold_hypsometry.csv"))
+
+df_hyps_hulun = fread(file.path(folder_lake_char, "Hulun", "Hulun_hypsometry.csv"))
+if(df_hyps_hulun[1L, DEPTH] != 0.0 & df_hyps_hulun[1L, DEPTH] == min(df_hyps_hulun[, DEPTH])){
+  df_hyps_hulun[1L, DEPTH := 0.0]
+}
+fwrite(df_hyps_hulun, file.path(folder_lake_char, "Hulun", "Hulun_hypsometry.csv"))
+
+# Mozhaysk daily obs file has a depth "???" in it
+df_temp_mozhaysk = fread(file.path(folder_lake_char, "Mozhaysk", "Mozhaysk_temp_daily.csv"))
+df_temp_mozhaysk = df_temp_mozhaysk[DEPTH != "???"]
+fwrite(df_temp_mozhaysk, file.path(folder_lake_char, "Mozhaysk", "Mozhaysk_temp_daily.csv"))
+
+# Large number of digits in depth of the Delavan hypsograph causes Simstrat to crash - 4 digits will do
+df_hyps_delavan = fread(file.path(folder_lake_char, "Delavan", "Delavan_hypsometry.csv"))
+df_hyps_delavan[, DEPTH := round(DEPTH, digits = 4L)]
+fwrite(df_hyps_delavan, file.path(folder_lake_char, "Delavan", "Delavan_hypsometry.csv"))
 
 ##### Write file -----
 fwrite(df_char, file.path(folder_lake_char, "LakeCharacteristics.csv"))

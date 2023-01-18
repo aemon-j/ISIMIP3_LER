@@ -93,9 +93,9 @@ calibration:                                    # calibration section
          upper: 2                               # upper bound for parameter
          initial: 1                             # initial value for parameter
          log: false                             # log transform scaling factor
-      glm_setup/min_layer_thick:
+      mixing/coef_mix_conv:
          lower: 0.1                             # lower bound for parameter
-         upper: 0.25                            # upper bound for parameter
+         upper: 0.3                            # upper bound for parameter
          initial: 0.2                           # initial value for parameter
          log: false                             # log transform scaling factor
       mixing/coef_mix_turb:
