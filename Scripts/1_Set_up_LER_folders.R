@@ -120,10 +120,16 @@ for(i in lakes){
       start_end_dates = format(start_end_dates, "%Y-%m-%d %H:%M:%S")
       
       if(k == "calibration"){
-        # Set start and end date based on observations, unless obs exceed forcing period
+        # Set start and end date based on observations
+        # Same end date if obs exceed forcing period
+        cal_start_date = df_obs[1L, datetime]
+        
         if(as.POSIXct(df_obs[.N, datetime]) < df_meteo[.N, datetime]){
-          start_end_dates = c(df_obs[1L, datetime], df_obs[.N, datetime])
+          cal_end_date = df_obs[.N, datetime]
+        }else{
+          cal_end_date = start_end_dates[2]
         }
+        start_end_dates = c(cal_start_date, cal_end_date)
       }
       
       # Latitude and longitude: take from LakeCharacteristics file
