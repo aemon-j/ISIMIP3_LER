@@ -174,5 +174,13 @@ df_hyps_delavan = fread(file.path(folder_lake_char, "Delavan", "Delavan_hypsomet
 df_hyps_delavan[, DEPTH := round(DEPTH, digits = 4L)]
 fwrite(df_hyps_delavan, file.path(folder_lake_char, "Delavan", "Delavan_hypsometry.csv"))
 
+# Alqueva - several -9999 water temperature observations
+alqueva_temp_obs_files = list.files(file.path(folder_lake_char, "Alqueva"), pattern = "_temp_")
+for(i in alqueva_temp_obs_files){
+  df_temp_alqueva = fread(file.path(folder_lake_char, "Alqueva", i))
+  df_temp_alqueva = df_temp_alqueva[WTEMP > -9998]
+  fwrite(df_temp_alqueva, file.path(folder_lake_char, "Alqueva", i))
+}
+
 ##### Write file -----
 fwrite(df_char, file.path(folder_lake_char, "LakeCharacteristics.csv"))
