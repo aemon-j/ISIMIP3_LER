@@ -34,6 +34,8 @@ best <- res$wide %>% group_by(lake = lake,
 
 best <- left_join(best, lake_meta, by = c("lake" = "Lake.Short.Name"))
 
+best %>% select(1:3) %>% filter(is.infinite(minRMSE))
+
 p_best_rmse <- ggplot(best) + geom_col(aes(x = model, y = minRMSE, fill = model)) +
   facet_wrap(~lake) + ggtitle("minimum RMSE (°C)") + thm
 
