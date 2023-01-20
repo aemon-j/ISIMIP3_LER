@@ -17,6 +17,6 @@ add_to_report = function(folder, report_name, step, core, text){
   
   the_report_name = paste0(report_name, "_", step, "-", core, ".txt")
   
-  cat(paste0(text, "\n"),
+  cat(paste0(text),
       file = file.path(folder, the_report_name), sep = "\n", append = T)
 }
