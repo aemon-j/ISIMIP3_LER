@@ -5,7 +5,9 @@ run_calib_on_core = function(cal_tasks, core_job){
   cal_tasks = cal_tasks[Core == core_job]
   
   add_to_report(file.path(folder_root, folder_report), report_name, 2L, core_job,
-                paste0("Tasks (", nrow(cal_tasks), "): ", paste0(cal_tasks[, Lakes], collapse = ", ")))
+                paste0("Started calibration with method ", cmethod, " and (max) number of runs: ",
+                       cal_iterations, " at ", Sys.time(), "Tasks (", nrow(cal_tasks), "): ",
+                       paste0(cal_tasks[, Lakes], collapse = ", ")))
   
   for(i in seq_len(nrow(cal_tasks))){
     cal_folder = file.path(folder_root,
@@ -15,12 +17,12 @@ run_calib_on_core = function(cal_tasks, core_job){
                            "calibration")
     
     setwd(cal_folder)
-    
+    start_time <- Sys.time()
     cali_ensemble(config_file = "LakeEnsemblR.yaml",
                   num = cal_iterations,
                   cmethod = cmethod,
                   model = models_to_run)
-    
+    end_time <- Sys.time()
     # Note: Cannot be run without setting wd
     # can't find file, despite file.exists(file.path(cal_folder, "LakeEnsemblR.yaml")) being TRUE
     # This should be possible (it can be done with export_config)
@@ -29,7 +31,8 @@ run_calib_on_core = function(cal_tasks, core_job){
     # I'd say it's an important thing to fix, but not doable right now, so let's use setwd
     
     add_to_report(file.path(folder_root, folder_report), report_name, 2L, core_job,
-                  paste0("Completed: ", cal_tasks[i, Lakes]))
+                  paste0("Completed: ", cal_tasks[i, Lakes], "; Started at: ", start_time,
+                         " finished at: ", end_time ))
     
   }
 }
