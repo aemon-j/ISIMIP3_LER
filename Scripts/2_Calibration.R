@@ -33,12 +33,14 @@ cal_tasks = divide_tasks_over_cores(cal_tasks, use_cores)
 
 use_cores = max(cal_tasks[, Core])
 
+report_date <- format(Sys.time(), "%Y%m%d_%H%M")
+
 ###### Set up cores using the parallel package -----
 clust = makeCluster(use_cores)
 clusterExport(clust, varlist = list("cal_tasks", "run_calib_on_core", "add_to_report",
                                     "folder_root", "folder_data", "calib_gcm",
                                     "cal_iterations", "cmethod", "models_to_run",
-                                    "folder_report", "report_name"),
+                                    "folder_report", "report_name", "report_date"),
                         envir = environment())
 clusterEvalQ(clust, expr = {library(LakeEnsemblR); library(data.table)})
 message("Calibrating models in parallel... ", paste0("[", Sys.time(), "]"))

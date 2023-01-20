@@ -4,10 +4,16 @@
 run_calib_on_core = function(cal_tasks, core_job){
   cal_tasks = cal_tasks[Core == core_job]
   
-  add_to_report(file.path(folder_root, folder_report), report_name, 2L, core_job,
-                paste0("Started calibration with method ", cmethod, " and (max) number of runs: ",
-                       cal_iterations, " at ", Sys.time(), "Tasks (", nrow(cal_tasks), "): ",
-                       paste0(cal_tasks[, Lakes], collapse = ", ")))
+  add_to_report(file.path(folder_root, folder_report),
+                paste0(report_name,"_", report_date, "_"), 2L, core_job,
+                paste0("Core:", core_job, ",Method:", cmethod, ",number_of_runs:",
+                       cal_iterations, ",Start_time:", Sys.time(), ",Tasks:",
+                       nrow(cal_tasks), ",Lake_names:'",
+                       paste0(cal_tasks[, Lakes], collapse = ", "),"'"))
+  
+  add_to_report(file.path(folder_root, folder_report),
+                paste0(report_name,"_", report_date, "_"), 2L, core_job,
+                paste0("Lake,Start_time,End_time"))
   
   for(i in seq_len(nrow(cal_tasks))){
     cal_folder = file.path(folder_root,
@@ -30,9 +36,10 @@ run_calib_on_core = function(cal_tasks, core_job){
     # Either work with folder = "." and setwd, or fix. 
     # I'd say it's an important thing to fix, but not doable right now, so let's use setwd
     
-    add_to_report(file.path(folder_root, folder_report), report_name, 2L, core_job,
-                  paste0("Completed: ", cal_tasks[i, Lakes], "; Started at: ", start_time,
-                         " finished at: ", end_time ))
+    add_to_report(file.path(folder_root, folder_report),
+                  paste0(report_name,"_", report_date, "_"), 2L, core_job,
+                  paste0(c(cal_tasks[i, Lakes], as.character(start_time),
+                           as.character(end_time)), collapse = ","))
     
   }
 }
