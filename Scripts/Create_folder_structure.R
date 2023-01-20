@@ -17,6 +17,10 @@ name_couples = df_char[`Lake Short Name` %in% lakes, .(`Lake Short Name`, `Lake 
 for(i in lakes){
   lake_report = name_couples[`Lake Short Name` == i, `Lake Name Folder`]
   
+  if(lake_report == "rappbodep"){
+    lake_report = "rappbode"
+  }
+  
   for(j in gcms){
     for(k in scens){
       if(k == "calibration") next
