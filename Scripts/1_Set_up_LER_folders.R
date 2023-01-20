@@ -207,3 +207,16 @@ for(i in lakes){
   progress = progress + 1
   setTxtProgressBar(progressBar,progress)
 }
+
+## fix problem with GLM fore some lakes caused by to low max_layers value
+for (i in c("Argyle", "FallingCreek", "Hassel", "Kinneret",
+            "Rimov", "Sammamish", "Tahoe", "Vendyurskoe")) {
+  glm_nml <- glmtools::read_nml(file.path(folder_root, folder_data, i,
+                                          calib_gcm, "calibration", "GLM",
+                                          "glm3.nml"))
+  glm_nml <- glmtools::set_nml(glm_nml, arg_name = 'max_layers', arg_val = 10000)
+  glmtools::write_nml(glm_nml, file = file.path(folder_root, folder_data, i,
+                                                calib_gcm, "calibration", "GLM",
+                                                "glm3.nml"))
+  
+}
