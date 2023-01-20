@@ -170,14 +170,17 @@ for(i in lakes){
       }
       
       ##### Initial temperature profile -----
-      df_init = create_init_profile2(df_obs, start_date = start_end_dates[1])
+      df_init = create_init_profile2(df_obs, start_date = start_end_dates[1],
+                                     max_depths = max_depths_init_prof)
       if(nrow(df_init) == 0L){
         df_init = create_init_profile2(df_obs, start_date = start_end_dates[1],
-                                       margin_time = months(3))
+                                       margin_time = months(3),
+                                       max_depths = max_depths_init_prof)
       }
       if(nrow(df_init) == 0L){
         df_init = create_init_profile2(df_obs, start_date = start_end_dates[1],
-                                       margin_time = months(5))
+                                       margin_time = months(5),
+                                       max_depths = max_depths_init_prof)
       }
       df_init = df_init[Depth_meter <= max_depth]
       
