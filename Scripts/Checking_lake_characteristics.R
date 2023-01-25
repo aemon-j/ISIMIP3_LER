@@ -182,5 +182,15 @@ for(i in alqueva_temp_obs_files){
   fwrite(df_temp_alqueva, file.path(folder_lake_char, "Alqueva", i))
 }
 
+# Lower Zurich - <3% of data in 1902, then rest 1978-2013. Remove 1902 data, as major bottleneck for calib
+df_temp_lzurich = fread(file.path(folder_lake_char, "LowerLakeZurich", "LowerZurich_temp_daily.csv"))
+df_temp_lzurich = df_temp_lzurich[as.POSIXct(as.character(TIMESTAMP), format = "%Y%m%d") > as.POSIXct("1975-01-01")]
+fwrite(df_temp_lzurich, file.path(folder_lake_char, "LowerLakeZurich", "LowerZurich_temp_daily.csv"))
+
+# Neuchatel - only 1 or 2 sampling dates per year until 1981. Remove first years, as bottleneck for calib
+df_temp_neuchatel = fread(file.path(folder_lake_char, "Neuchatel", "Neuchatel_temp_daily.csv"))
+df_temp_neuchatel = df_temp_neuchatel[as.POSIXct(as.character(TIMESTAMP), format = "%Y%m%d") >= as.POSIXct("1981-01-01")]
+fwrite(df_temp_neuchatel, file.path(folder_lake_char, "Neuchatel", "Neuchatel_temp_daily.csv"))
+
 ##### Write file -----
 fwrite(df_char, file.path(folder_lake_char, "LakeCharacteristics.csv"))
