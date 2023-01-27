@@ -105,9 +105,9 @@ calibration:                                    # calibration section
          log: false                             # log transform scaling factor
    GOTM:                                        # GOTM specific parameters
       turb_param/k_min:
-         lower: 5E-6                            # lower bound for parameter
-         upper: 5E-4                            # upper bound for parameter
-         initial: 1E-5                          # initial value for parameter
+         lower: 1.4E-7                            # lower bound for parameter
+         upper: 1E-5                            # upper bound for parameter
+         initial: 1E-6                          # initial value for parameter
          log: true                              # log transform scaling factor
       bottom/h0b:
          lower: 0.025                           # lower bound for parameter
