@@ -194,7 +194,12 @@ for(i in lakes){
       
       ##### Spin-up -----
       if(spin_up_period > 0L){
-        add_spin_up(the_folder, spin_up_years = spin_up_period)
+        if(k == "calibration"){
+          add_spin_up(the_folder, spin_up_years = spin_up_period, spin_up_source = "met_file")
+        }else{
+          add_spin_up(the_folder, spin_up_years = spin_up_period)
+        }
+        
       }
       
       export_config("LakeEnsemblR.yaml",
