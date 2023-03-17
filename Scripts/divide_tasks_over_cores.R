@@ -8,7 +8,7 @@
 
 
 divide_tasks_over_cores = function(cal_tasks, num_cores){
-  # I did a test using GOTM to predict runtime from number of layers and length of simulation
+  # The estimation of runtime is based on a test run with 10 iterations
   # Results are in this dataset
   df_runtime_pred = fread(file.path(folder_root, folder_test_result, "Runtime_Equation.csv"))
   
@@ -16,13 +16,9 @@ divide_tasks_over_cores = function(cal_tasks, num_cores){
   df_runtime = suppressWarnings({data.table(Lakes = unique(cal_tasks[, Lakes]),
                                             Layers = as.numeric(),
                                             Duration = as.numeric(),
-                                            Runtime = as.numeric())}) 
+                                            Runtime = as.numeric())})
   
-  # Note that number of layers is only for GOTM and Simstrat. However, expectation is that GLM and FLake might
-  # have a similar dependence with lake depth and number of depth for which to create output
-  # (also, GOTM and especially Simstrat tend to be slowest, so most relevant bottleneck)
-  
-  # Fill in number of layers and runtime
+  # Fill in max depth and runtime
   for(i in seq_len(nrow(df_runtime))){
     lakename = df_runtime[i, Lakes]
     
@@ -30,20 +26,20 @@ divide_tasks_over_cores = function(cal_tasks, num_cores){
     df_obs = fread(file.path(folder_root, folder_data, lakename, tolower(calib_gcm), "calibration/obs_wtemp.csv"))
     
     max_depth = max(df_hyps[, Depth_meter])
-    layer_thickness = get_output_resolution(max_depth)
-    num_layers = ceiling(max_depth / layer_thickness)
+    # layer_thickness = get_output_resolution(max_depth)
+    # num_layers = ceiling(max_depth / layer_thickness)
     
     duration = as.numeric(difftime(df_obs[.N, datetime], df_obs[1L, datetime], units = "days"))
     duration = duration / 365
     
-    df_runtime[i, `:=`(Layers = num_layers,
+    df_runtime[i, `:=`(Maxdepth = max_depth,
                        Duration = duration)]
   }
   
   df_runtime[, Runtime := df_runtime_pred[1L, intercept] +
-               df_runtime_pred[1L, slope_layers] * Layers +
+               df_runtime_pred[1L, slope_maxdepth] * Maxdepth +
                df_runtime_pred[1L, slope_duration] * Duration +
-               df_runtime_pred[1L, slope_interaction] * Layers * Duration]
+               df_runtime_pred[1L, slope_interaction] * Maxdepth * Duration]
   
   cal_tasks = merge(df_runtime, cal_tasks, by = "Lakes")
   

@@ -170,14 +170,17 @@ for(i in lakes){
       }
       
       ##### Initial temperature profile -----
-      df_init = create_init_profile2(df_obs, start_date = start_end_dates[1])
+      df_init = create_init_profile2(df_obs, start_date = start_end_dates[1],
+                                     max_depths = max_depths_init_prof)
       if(nrow(df_init) == 0L){
         df_init = create_init_profile2(df_obs, start_date = start_end_dates[1],
-                                       margin_time = months(3))
+                                       margin_time = months(3),
+                                       max_depths = max_depths_init_prof)
       }
       if(nrow(df_init) == 0L){
         df_init = create_init_profile2(df_obs, start_date = start_end_dates[1],
-                                       margin_time = months(5))
+                                       margin_time = months(5),
+                                       max_depths = max_depths_init_prof)
       }
       df_init = df_init[Depth_meter <= max_depth]
       
@@ -191,7 +194,12 @@ for(i in lakes){
       
       ##### Spin-up -----
       if(spin_up_period > 0L){
-        add_spin_up(the_folder, spin_up_years = spin_up_period)
+        if(k == "calibration"){
+          add_spin_up(the_folder, spin_up_years = spin_up_period, spin_up_source = "met_file")
+        }else{
+          add_spin_up(the_folder, spin_up_years = spin_up_period)
+        }
+        
       }
       
       export_config("LakeEnsemblR.yaml",
@@ -205,15 +213,15 @@ for(i in lakes){
   setTxtProgressBar(progressBar,progress)
 }
 
-## fix problem with GLM fore some lakes caused by to low max_layers value
-for (i in c("Argyle", "FallingCreek", "Hassel", "Kinneret",
-            "Rimov", "Sammamish", "Tahoe", "Vendyurskoe")) {
-  glm_nml <- glmtools::read_nml(file.path(folder_root, folder_data, i,
-                                          calib_gcm, "calibration", "GLM",
-                                          "glm3.nml"))
-  glm_nml <- glmtools::set_nml(glm_nml, arg_name = 'max_layers', arg_val = 10000)
-  glmtools::write_nml(glm_nml, file = file.path(folder_root, folder_data, i,
-                                                calib_gcm, "calibration", "GLM",
-                                                "glm3.nml"))
-  
-}
+# ## fix problem with GLM fore some lakes caused by to low max_layers value
+# for (i in c("Argyle", "FallingCreek", "Hassel", "Kinneret",
+#             "Rimov", "Sammamish", "Tahoe", "Vendyurskoe")) {
+#   glm_nml <- glmtools::read_nml(file.path(folder_root, folder_data, i,
+#                                           calib_gcm, "calibration", "GLM",
+#                                           "glm3.nml"))
+#   glm_nml <- glmtools::set_nml(glm_nml, arg_name = 'max_layers', arg_val = 10000)
+#   glmtools::write_nml(glm_nml, file = file.path(folder_root, folder_data, i,
+#                                                 calib_gcm, "calibration", "GLM",
+#                                                 "glm3.nml"))
+#   
+# }

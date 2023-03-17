@@ -25,6 +25,9 @@ models_to_run = c("FLake", "GLM", "GOTM", "Simstrat")
 # Spin-up period used for all simulations, including the calibration
 spin_up_period = 0L
 
+# Maximum number of depths to include in the initial temperature profile
+max_depths_init_prof = 20L
+
 ##### Report settings -----
 
 report_name = "Test"
@@ -33,7 +36,7 @@ report_name = "Test"
 ##### Calibration settings -----
 
 frac_of_cores = 1.0 # Fraction of available cores to use, rounded up. 
-cal_iterations = 2000
+cal_iterations = 10 # 1000
 cmethod = "LHC" # Calibration method to use, see ?cali_ensemble
 
 #### IMPORTANT!!!!!
