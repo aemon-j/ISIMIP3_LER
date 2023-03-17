@@ -161,7 +161,17 @@ for(i in lakes){
       
       ### Light
       input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
-                          key1 = "input", key2 = "light", key3 = "Kw", value = extinc_coef, verbose = F)
+                          key1 = "input", key2 = "light", key3 = "Kw",
+                          key4 = "FLake",value = extinc_coef, verbose = F)
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "input", key2 = "light", key3 = "Kw",
+                          key4 = "GLM", value = extinc_coef, verbose = F)
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "input", key2 = "light", key3 = "Kw",
+                          key4 = "GOTM", value = extinc_coef, verbose = F)
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "input", key2 = "light", key3 = "Kw",
+                          key4 = "Simstrat", value = extinc_coef, verbose = F)
       
       ### No observed water temperature in case of no calibration
       if(k != "calibration"){
