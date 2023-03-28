@@ -64,6 +64,8 @@ for(i in lakes){
           if(m %in% c("wind_speed", "swr", "lwr")){
             # Add in scaling_factors section
             ls_LER_config[["scaling_factors"]][[j]][[m]] = df_cal[ind_bestfit, ..m][[1]]
+          }else if(m == "Kw"){
+            ls_LER_config[["input"]][["light"]][[m]][[j]] = df_cal[ind_bestfit, ..m][[1]]
           }else{
             # Add in model_parameters section
             ls_LER_config[["model_parameters"]][[j]][[m]] = df_cal[ind_bestfit, ..m][[1]]
