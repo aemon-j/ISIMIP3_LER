@@ -7,7 +7,8 @@ req_packages = c("data.table",
                  "ncdf4",
                  "parallel",
                  "configr",
-                 "FME")
+                 "FME",
+                 "glmtools")
 
 # Make sure all packages are installed and then load them
 suppressWarnings({

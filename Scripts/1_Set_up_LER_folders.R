@@ -218,6 +218,10 @@ for(i in lakes){
                     model = models_to_run,
                     folder = the_folder)
       
+      # Add debugging/disable_evap section to the GLM config file to avoid water loss
+      nml = read_nml(file.path("GLM", "glm3.nml"))
+      nml[["debugging"]][["disable_evap"]] = TRUE
+      write_nml(nml, file.path("GLM", "glm3.nml"))
     }
   }
   
