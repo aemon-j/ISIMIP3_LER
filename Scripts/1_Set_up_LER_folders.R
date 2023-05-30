@@ -219,6 +219,21 @@ for(i in lakes){
                           key1 = "input", key2 = "light", key3 = "Kw",
                           key4 = "Simstrat", value = extinc_coef, verbose = F)
       
+      ### Light calibration
+      min_range = get_yaml_multiple(file = file.path(folder_root, folder_template_LER, "LakeEnsemblR.yaml"),
+                                    key1 = "calibration", key2 = "Kw", key3 = "lower")
+      max_range = get_yaml_multiple(file = file.path(folder_root, folder_template_LER, "LakeEnsemblR.yaml"),
+                                    key1 = "calibration", key2 = "Kw", key3 = "upper")
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "calibration", key2 = "Kw", key3 = "initial",
+                          value = extinc_coef, verbose = F)
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "calibration", key2 = "Kw", key3 = "lower",
+                          value = extinc_coef * min_range, verbose = F)
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "calibration", key2 = "Kw", key3 = "upper",
+                          value = extinc_coef * max_range, verbose = F)
+      
       ### No observed water temperature in case of no calibration
       if(k != "calibration"){
         input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
