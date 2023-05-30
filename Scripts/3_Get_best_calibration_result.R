@@ -51,6 +51,46 @@ for(i in lakes){
     # Enter information in the LER config file in the folder of every gcm
     pars_to_set = names(df_cal)[!(names(df_cal) %in% c("par_id", "rmse"))]
     
+    if(calib_type == "cal_project"){
+      # Write to same folder as "LakeEnsemblR_calib.yaml" and then don't do
+      # the whole loop over the gcms and scens
+      ls_LER_config = read.config(file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR.yaml"))
+      
+      for(m in pars_to_set){
+        if(m %in% c("wind_speed", "swr", "lwr")){
+          # Add in scaling_factors section
+          ls_LER_config[["scaling_factors"]][[j]][[m]] = df_cal[ind_bestfit, ..m][[1]]
+        }else if(m == "Kw"){
+          ls_LER_config[["input"]][["light"]][[m]][[j]] = df_cal[ind_bestfit, ..m][[1]]
+        }else{
+          # Add in model_parameters section
+          ls_LER_config[["model_parameters"]][[j]][[m]] = df_cal[ind_bestfit, ..m][[1]]
+        }
+      }
+      
+      # Write the updated config file
+      write.config(ls_LER_config,
+                   file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR_calib.yaml"),
+                   write.type = "yaml",
+                   indent = 3L,
+                   handlers = list(
+                     logical = function(x){
+                       result = ifelse(x, "true", "false")
+                       class(result) = "verbatim"
+                       return(result)
+                     },
+                     NULL = function(x){
+                       result = "NULL"
+                       class(result) = "verbatim"
+                       return(result)
+                     }
+                   ))
+      
+      progress = progress + 1
+      setTxtProgressBar(progressBar,progress)
+      next
+    }
+    
     for(k in gcms){
       for(l in scens[!(scens %in% "calibration")]){
         
@@ -72,7 +112,7 @@ for(i in lakes){
           }
         }
         
-        # Write the update config file
+        # Write the updated config file
         # (handles needed to write true/false instead of yes/no, and to write "" for empty fields)
         write.config(ls_LER_config,
                      LER_config_path,
@@ -102,8 +142,6 @@ for(i in lakes){
                     folder = file.path(folder_root, folder_data, i, tolower(j), k))
     }
   }
-  
-  
   
   progress = progress + 1
   setTxtProgressBar(progressBar,progress)

@@ -18,6 +18,7 @@ lakes = c("Allequash", "Alqueva", "Annie", "Arendsee", "Argyle", "Biel",
           "Washington", "Windermere", "Wingra", "Zlutice", "Zurich")
 models_to_run = c("FLake", "GLM", "GOTM", "Simstrat")
 
+calib_type = "standard" # "standard" or "cal_project"
 
 ##### Folder set-up settings -----
 
@@ -36,8 +37,12 @@ report_name = "Test"
 ##### Calibration settings -----
 
 frac_of_cores = 1.0 # Fraction of available cores to use, rounded up. 
-cal_iterations = 500
+cal_iterations = 2000
 cmethod = "LHC" # Calibration method to use, see ?cali_ensemble
+
+# cal_project only:
+min_duration_obs = 10 # years
+val_duration = 5 # years. Remainder will be calibration period
 
 #### IMPORTANT!!!!!
 #### THE PARAMETERS TO CALIBRATE AND THEIR RANGES SHOULD BE SET IN THE "LakeEnsemblR.yaml" FILE

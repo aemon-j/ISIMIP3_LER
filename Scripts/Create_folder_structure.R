@@ -23,7 +23,7 @@ for(i in lakes){
   
   for(j in gcms){
     for(k in scens){
-      if(k == "calibration") next
+      if(k == "calibration" | calib_type == "cal_project") next
       
       the_folder = file.path(folder_root,
                              folder_data,
