@@ -1,0 +1,11 @@
+Standard run:
+calib_type = "standard"
+calib_gcm = "GSWP3-W5E5"
+spin_up_period = 1L
+folder_data = "ISIMIPdata"
+
+Calibration project (Tom Lorimer):
+calib_type = "cal_project"
+calib_gcm = "20CRv3-ERA5"
+spin_up_period = 2L
+folder_data = "Calib_project"

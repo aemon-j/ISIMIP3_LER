@@ -51,6 +51,14 @@ for(i in lakes){
     df_obs[, TIMESTAMP := as.POSIXct(TIMESTAMP)]
   }
   setnames(df_obs, c("datetime", "Depth_meter", "Water_Temperature_celsius"))
+  
+  if(calib_type == "cal_project"){
+    # Skip the lake if there are no sufficient observations
+    if(difftime(df_obs[.N, datetime], df_obs[1L, datetime], units = "days") <
+       min_duration_obs * 365){
+      next
+    }
+  }
   df_obs[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
   
   ##### Select depth resolution of output -----
@@ -75,6 +83,11 @@ for(i in lakes){
     extinc_coef = round(1.1925 * max_depth^(-0.424), 3L)
   }
   
+  if(calib_type == "cal_project"){
+    # For calibration project, always use Hakanson
+    extinc_coef = round(1.1925 * max_depth^(-0.424), 3L)
+  }
+  
   ##### Read elevation -----
   elev = df_char[`Lake Short Name` == i, `elevation (m)`]
   latitude = df_char[`Lake Short Name` == i, `latitude (dec deg)`]
@@ -84,6 +97,7 @@ for(i in lakes){
     for(k in scens){
       if(j != calib_gcm & k == "calibration") next
       if(j == calib_gcm & k != "calibration") next
+      if(calib_type == "cal_project" & j != calib_gcm) next
       
       the_folder = file.path(folder_root, folder_data, i, tolower(j), k)
       
@@ -102,7 +116,33 @@ for(i in lakes){
       
       ##### Observations -----
       if(k == "calibration"){
-        fwrite(df_obs, file.path(the_folder, "obs_wtemp.csv"))
+        if(calib_type == "standard"){
+          fwrite(df_obs, file.path(the_folder, "obs_wtemp.csv"))
+        }else if(calib_type == "cal_project"){
+          # End date validation: earliest of end of forcing set or end in-lake obs
+          df_meteo = fread(file.path(the_folder, "meteo.csv"))
+          end_forcing_set = df_meteo[.N, datetime]
+          end_lake_obs = as.POSIXct(df_obs[.N, datetime])
+          end_val = min(end_forcing_set, end_lake_obs)
+          
+          # Restrict runtime to min_duration_obs years (without spin-up)
+          start_cal = end_val - years(min_duration_obs)
+          start_val = end_val - years(val_duration)
+          
+          df_obs[, datetime := as.POSIXct(datetime)]
+          df_obs_cal = df_obs[datetime >= start_cal & datetime < start_val]
+          df_obs_val = df_obs[datetime >= start_val & datetime <= end_val]
+          if(nrow(df_obs_cal) == 0L | nrow(df_obs_val) == 0L){
+            stop("Either no data for calibration or validation for lake ", i, "!")
+          }
+          df_obs_cal[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
+          df_obs_val[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
+          
+          fwrite(df_obs_cal, file.path(the_folder, "obs_wtemp.csv"))
+          fwrite(df_obs_val, file.path(the_folder, "obs_wtemp_val.csv"))
+        }else{
+          stop("Invalid value of 'calib_type'!")
+        }
       }
       
       ##### LER configuration file -----
@@ -122,7 +162,11 @@ for(i in lakes){
       if(k == "calibration"){
         # Set start and end date based on observations
         # Same end date if obs exceed forcing period
-        cal_start_date = df_obs[1L, datetime]
+        if(calib_type == "standard"){
+          cal_start_date = df_obs[1L, datetime]
+        }else if(calib_type == "cal_project"){
+          cal_start_date = start_cal
+        }
         
         if(as.POSIXct(df_obs[.N, datetime]) < df_meteo[.N, datetime]){
           cal_end_date = df_obs[.N, datetime]
@@ -175,6 +219,21 @@ for(i in lakes){
                           key1 = "input", key2 = "light", key3 = "Kw",
                           key4 = "Simstrat", value = extinc_coef, verbose = F)
       
+      ### Light calibration
+      min_range = get_yaml_multiple(file = file.path(folder_root, folder_template_LER, "LakeEnsemblR.yaml"),
+                                    key1 = "calibration", key2 = "Kw", key3 = "lower")
+      max_range = get_yaml_multiple(file = file.path(folder_root, folder_template_LER, "LakeEnsemblR.yaml"),
+                                    key1 = "calibration", key2 = "Kw", key3 = "upper")
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "calibration", key2 = "Kw", key3 = "initial",
+                          value = extinc_coef, verbose = F)
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "calibration", key2 = "Kw", key3 = "lower",
+                          value = extinc_coef * min_range, verbose = F)
+      input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
+                          key1 = "calibration", key2 = "Kw", key3 = "upper",
+                          value = extinc_coef * max_range, verbose = F)
+      
       ### No observed water temperature in case of no calibration
       if(k != "calibration"){
         input_yaml_multiple(file = file.path(the_folder, "LakeEnsemblR.yaml"),
@@ -211,7 +270,6 @@ for(i in lakes){
         }else{
           add_spin_up(the_folder, spin_up_years = spin_up_period)
         }
-        
       }
       
       export_config("LakeEnsemblR.yaml",
@@ -219,9 +277,9 @@ for(i in lakes){
                     folder = the_folder)
       
       # Add debugging/disable_evap section to the GLM config file to avoid water loss
-      nml = read_nml(file.path("GLM", "glm3.nml"))
+      nml = read_nml(file.path(the_folder, "GLM", "glm3.nml"))
       nml[["debugging"]][["disable_evap"]] = TRUE
-      write_nml(nml, file.path("GLM", "glm3.nml"))
+      write_nml(nml, file.path(the_folder, "GLM", "glm3.nml"))
     }
   }
   

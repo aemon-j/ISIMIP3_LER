@@ -76,9 +76,9 @@ calibration:                                    # calibration section
          initial: 1                             # initial value for shortwave radiation scaling
          log: false                             # log transform scaling factor
    Kw:
-      lower: 0.5                             # lower bound for wind speed scaling
-      upper: 1.5                             # upper bound for wind speed scaling
-      initial: 0.98                             # initial value for wind speed scaling
+      lower: 0.7                             # lower bound for wind speed scaling
+      upper: 1.3                             # upper bound for wind speed scaling
+      initial: 1.0                             # initial value for wind speed scaling
       log: false                             # log transform scaling factor
    FLake:                                       # FLake specific parameters
       c_relax_C:
