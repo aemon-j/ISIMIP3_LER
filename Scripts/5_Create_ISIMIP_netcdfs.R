@@ -50,6 +50,15 @@ for(i in lakes){
                            format = "%Y-%m-%d %H:%M", tz = "UTC")
       time <- as.POSIXct(tim, origin = origin, tz = "UTC")
       
+      ### Remove the spin-up period
+      first_time_sim = time[1L] + years(spin_up_period)
+      first_ind = which(time >= first_time_sim)[1L]
+      df_temp = df_temp[,first_ind:length(time),]
+      df_ice = df_ice[,first_ind:length(time)]
+      df_qh = df_qh[,first_ind:length(time)]
+      df_qe = df_qe[,first_ind:length(time)]
+      time = time[first_ind:length(time)]
+      
       ##### Read or compute the relevant output variables and write them for all models -----
       for(l in seq_along(models_to_run)){
         modelname = paste0(tolower(models_to_run[l]), "-ler")
@@ -84,7 +93,18 @@ for(i in lakes){
         
         ### Stratification - strat
         # Stratified if top-bottom density difference is greater than 0.1 kg/m3
-        df_model_strat = fifelse(temp_to_dens(df_model_temp[, ..last_col_non_na]) - temp_to_dens(df_model_temp[, 1L]) >= 0.1,
+        
+        # Extracting the last non-NA value for each row
+        last_col_non_na_variable = rowSums(!is.na(df_model_temp))
+        bottom_temps = sapply(1:nrow(df_model_temp), function(x){
+          if(last_col_non_na_variable[x] == 0){
+            as.numeric(NA)
+          }else{
+            df_model_temp[[last_col_non_na_variable[x]]][x]
+          }
+        })
+        
+        df_model_strat = fifelse(temp_to_dens(bottom_temps) - temp_to_dens(df_model_temp[, 1L]) >= 0.1,
                                  1L, 0L)
         var_name = "strat"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
@@ -126,7 +146,7 @@ for(i in lakes){
                             lat = latitude, lon = longitude)
         
         ### Bottom temperature - bottemp
-        df_bott_temp = df_model_temp[[last_col_non_na]] + 273.15
+        df_bott_temp = bottom_temps + 273.15
         
         var_name = "bottemp"
         name_netcdf = paste0(modelname, "_", tolower(j), "_lange2021_", k, "_", var_name,
