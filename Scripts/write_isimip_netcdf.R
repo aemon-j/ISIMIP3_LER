@@ -63,9 +63,12 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
                                       var_name = nc_var), force_v4 = T)
   }
   
+  # Change format to netcdf4-classic
+  ncout$format = "NC_FORMAT_NETCDF4_CLASSIC"
+  
   # Add Global attributes
   ncatt_put(ncout, varid = 0, attname = "contact", attval = "Jorrit Mesman <jorrit.mesman@ebc.uu.se>")
-  ncatt_put(ncout, varid = 0, attname = "institution", attval = "Uppsala University (UU)")
+  ncatt_put(ncout, varid = 0, attname = "institution", attval = "Uppsala University (UU); Technische Universität Dresden (TUD)")
   ncatt_put(ncout, varid = 0, attname = "comment", attval = "Data prepared for ISIMIP3b")
   
   # Add standard name to the variable
