@@ -16,6 +16,7 @@ name_couples = df_char[, .(`Lake Short Name`, `Lake Name Folder`)]
 bias_adj_name = "w5e5"
 soc_scen_name = "2015soc"
 sens_scen_name = "default"
+start_future = as.POSIXct("2015-01-01")
 
 for(i in lakes){
   lake_report_name = name_couples[`Lake Short Name` == i, `Lake Name Folder`]
@@ -86,19 +87,43 @@ for(i in lakes){
         var_name = "watertemp"
         var_longname = "Temperature of Lake Water"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        
         if(!dir.exists(file.path(folder_root, folder_out))){
           dir.create(file.path(folder_root, folder_out), recursive = TRUE)
         }
         
-        write_isimip_netcdf(df_model_temp_write, time, deps = model_depths, var_name = var_name,
-                            var_unit = "K", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
-        
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          ind_start_hist = 1L
+          ind_end_hist = sum(time < start_future)
+          ind_end_future = length(time)
+          
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_model_temp_write[ind_start_hist:ind_end_hist,], time[ind_start_hist:ind_end_hist], deps = model_depths, var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_model_temp_write[(ind_end_hist + 1):ind_end_future,], time[(ind_end_hist + 1):ind_end_future], deps = model_depths, var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_model_temp_write, time, deps = model_depths, var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
         
         ### Stratification - strat
         # Stratified if top-bottom density difference is greater than 0.1 kg/m3
@@ -118,14 +143,36 @@ for(i in lakes){
         var_name = "strat"
         var_longname = "Thermal Stratification"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        write_isimip_netcdf(df_model_strat, time, var_name = var_name,
-                            var_unit = "1", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
         
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_model_strat[ind_start_hist:ind_end_hist], time[ind_start_hist:ind_end_hist], var_name = var_name,
+                              var_unit = "1", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_model_strat[(ind_end_hist + 1):ind_end_future], time[(ind_end_hist + 1):ind_end_future], var_name = var_name,
+                              var_unit = "1", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_model_strat, time, var_name = var_name,
+                              var_unit = "1", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
         
         ### Thermocline - thermodepth
         # Using rLakeAnalyzer and its default settings
@@ -138,13 +185,35 @@ for(i in lakes){
         var_name = "thermodepth"
         var_longname = "Depth of Thermocline"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        write_isimip_netcdf(df_thermo_depth, time, var_name = var_name,
-                            var_unit = "m", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_thermo_depth[ind_start_hist:ind_end_hist], time[ind_start_hist:ind_end_hist], var_name = var_name,
+                              var_unit = "m", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_thermo_depth[(ind_end_hist + 1):ind_end_future], time[(ind_end_hist + 1):ind_end_future], var_name = var_name,
+                              var_unit = "m", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_thermo_depth, time, var_name = var_name,
+                              var_unit = "m", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
         
         ### Surface temperature - surftemp
         df_surf_temp = df_model_temp[[1L]] + 273.15
@@ -152,13 +221,35 @@ for(i in lakes){
         var_name = "surftemp"
         var_longname = "Temperature of Lake Surface Water"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        write_isimip_netcdf(df_surf_temp, time, var_name = var_name,
-                            var_unit = "K", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_surf_temp[ind_start_hist:ind_end_hist], time[ind_start_hist:ind_end_hist], var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_surf_temp[(ind_end_hist + 1):ind_end_future], time[(ind_end_hist + 1):ind_end_future], var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_surf_temp, time, var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
         
         ### Bottom temperature - bottemp
         df_bott_temp = bottom_temps + 273.15
@@ -166,13 +257,35 @@ for(i in lakes){
         var_name = "bottemp"
         var_longname = "Temperature of Lake Bottom Water"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        write_isimip_netcdf(df_bott_temp, time, var_name = var_name,
-                            var_unit = "K", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_bott_temp[ind_start_hist:ind_end_hist], time[ind_start_hist:ind_end_hist], var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_bott_temp[(ind_end_hist + 1):ind_end_future], time[(ind_end_hist + 1):ind_end_future], var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_bott_temp, time, var_name = var_name,
+                              var_unit = "K", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
         
         ### Ice thickness - icethick
         df_model_icethick = df_ice[l, ]
@@ -180,13 +293,35 @@ for(i in lakes){
         var_name = "icethick"
         var_longname = "Ice Thickness"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        write_isimip_netcdf(df_model_icethick, time, var_name = var_name,
-                            var_unit = "m", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_model_icethick[ind_start_hist:ind_end_hist], time[ind_start_hist:ind_end_hist], var_name = var_name,
+                              var_unit = "m", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_model_icethick[(ind_end_hist + 1):ind_end_future], time[(ind_end_hist + 1):ind_end_future], var_name = var_name,
+                              var_unit = "m", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_model_icethick, time, var_name = var_name,
+                              var_unit = "m", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
         
         ### Ice presence - ice
         df_model_icepresence = fifelse(df_model_icethick > 0, 1L, 0L)
@@ -194,13 +329,35 @@ for(i in lakes){
         var_name = "ice"
         var_longname = "Lake Ice Cover"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        write_isimip_netcdf(df_model_icepresence, time, var_name = var_name,
-                            var_unit = "1", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_model_icepresence[ind_start_hist:ind_end_hist], time[ind_start_hist:ind_end_hist], var_name = var_name,
+                              var_unit = "1", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_model_icepresence[(ind_end_hist + 1):ind_end_future], time[(ind_end_hist + 1):ind_end_future], var_name = var_name,
+                              var_unit = "1", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_model_icepresence, time, var_name = var_name,
+                              var_unit = "1", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
         
         ### Sensible heat flux (upward is positive) - sensheatf-total
         df_model_qh = -1 * df_qh[l, ]
@@ -218,13 +375,35 @@ for(i in lakes){
         var_name = "sensheatf-total"
         var_longname = "Sensible Heat Flux at Lake-Atmosphere Interface"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        write_isimip_netcdf(df_model_qh, time, var_name = var_name,
-                            var_unit = "W m-2", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_model_qh[ind_start_hist:ind_end_hist], time[ind_start_hist:ind_end_hist], var_name = var_name,
+                              var_unit = "W m-2", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_model_qh[(ind_end_hist + 1):ind_end_future], time[(ind_end_hist + 1):ind_end_future], var_name = var_name,
+                              var_unit = "W m-2", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_model_qh, time, var_name = var_name,
+                              var_unit = "W m-2", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
         
         ### Latent heat flux (upward is positive) - latentheatf
         df_model_qe = -1 * df_qe[l, ]
@@ -234,13 +413,36 @@ for(i in lakes){
         var_name = "latentheatf"
         var_longname = "Latent Heat Flux at Lake-Atmosphere Interface"
         
-        name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
-                             "_", lake_report_name, "_daily_", year(time[1L]), "_",
-                             year(time[length(time)]), ".nc")
-        write_isimip_netcdf(df_model_qe, time, var_name = var_name,
-                            var_unit = "W m-2", var_longname,
-                            file_name = file.path(folder_root, folder_out, name_netcdf),
-                            lat = latitude, lon = longitude)
+        if(k == "picontrol"){
+          ### Write separate files for historical and future
+          # Historical
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_start_hist]), "_",
+                               year(time[ind_end_hist]), ".nc")
+          write_isimip_netcdf(df_model_qe[ind_start_hist:ind_end_hist], time[ind_start_hist:ind_end_hist], var_name = var_name,
+                              var_unit = "W m-2", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          # Future
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[ind_end_hist + 1]), "_",
+                               year(time[ind_end_future]), ".nc")
+          write_isimip_netcdf(df_model_qe[(ind_end_hist + 1):ind_end_future], time[(ind_end_hist + 1):ind_end_future], var_name = var_name,
+                              var_unit = "W m-2", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+          
+        }else{
+          name_netcdf = paste0(modelname, "_", tolower(j), "_", bias_adj_name, "_", k, "_", soc_scen_name, "_", sens_scen_name, "_", var_name,
+                               "_", lake_report_name, "_daily_", year(time[1L]), "_",
+                               year(time[length(time)]), ".nc")
+          
+          write_isimip_netcdf(df_model_qe, time, var_name = var_name,
+                              var_unit = "W m-2", var_longname = var_longname,
+                              file_name = file.path(folder_root, folder_out, name_netcdf),
+                              lat = latitude, lon = longitude)
+        }
+        
       }
     }
   }
