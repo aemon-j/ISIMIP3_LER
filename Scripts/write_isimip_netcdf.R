@@ -22,10 +22,12 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
                       vals = as.double(ndays), calendar = "proleptic_gregorian",
                       unlim = T)
   
-  # Levlak dimension (positive numbers below surface)
+  # Levlak (positive numbers below surface) and depth-bounds dimensions
   if(!is.null(deps)){
     levlakdim = ncdim_def("levlak", units = "-", vals = as.numeric(seq_along(deps)),
                           longname = "Vertical Water Layer Index")
+    bndsdim = ncdim_def("bnds", units = "", vals = c(0, 1),
+                        longname = "")
   }
   
   # What to do with NA data?
@@ -48,6 +50,11 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
                           missval = NULL,
                           longname = "Depth of Vertical Layer Center Below Surface",
                           prec = "float", compression = compression, shuffle = FALSE)
+    depthbnd_var = ncvar_def("depth_bnds", "m",
+                             list(bndsdim, levlakdim),
+                             missval = NULL,
+                             longname = "Depth of Layer's Top and Bottom Below Surface",
+                             prec = "float", compression = compression, shuffle = FALSE)
   }
   
   # If file exists - delete it
@@ -60,6 +67,7 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
     ncout = nc_create(file_name, list(var_name = nc_var), force_v4 = T)
   }else{
     ncout = nc_create(file_name, list(depth = depth_var,
+                                      depth_bnds = depthbnd_var,
                                       var_name = nc_var), force_v4 = T)
   }
   
@@ -70,7 +78,7 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
   
   # Add Global attributes
   ncatt_put(ncout, varid = 0, attname = "contact", attval = "Jorrit Mesman <jorrit.mesman@ebc.uu.se>")
-  ncatt_put(ncout, varid = 0, attname = "institution", attval = "Uppsala University (UU); Technische Universität Dresden (TUD)")
+  ncatt_put(ncout, varid = 0, attname = "institution", attval = "Uppsala University (UU); Technische Universitaet Dresden (TUD)")
   ncatt_put(ncout, varid = 0, attname = "comment", attval = "Data prepared for ISIMIP3b")
   
   # Add standard name to the variable
@@ -88,6 +96,18 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
     ncatt_put(ncout, varid = "levlak", attname = "standard_name", attval = "water_layer")
     ncatt_put(ncout, varid = "levlak", attname = "positive", attval = "down")
     ncatt_put(ncout, varid = "levlak", attname = "axis", attval = "Z")
+    
+    ncatt_put(ncout, varid = "bnds", attname = "positive", attval = "down")
+    
+    # Compute depth-bounds matrix
+    bnd_step = (deps[1] - deps[2]) / 2
+    max_depth = max(abs(deps))
+    the_bnds = 1
+    upr_bnds = abs(deps) - bnd_step
+    lwr_bnds = abs(deps) + bnd_step
+    upr_bnds[upr_bnds < 0] = 0
+    lwr_bnds[lwr_bnds > max_depth] = max_depth
+    bnd_mtr = rbind(upr_bnds, lwr_bnds)
   }
   
   # Add tryCatch ensure that it closes netCDF file
@@ -101,11 +121,17 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
     }else{
       # Add 2D variable
       ncvar_put(nc = ncout, varid = depth_var, vals = as.double(-deps))
+      ncvar_put(nc = ncout, varid = depthbnd_var, vals = bnd_mtr)
       ncvar_put(nc = ncout, varid = nc_var, vals = vals)
       
       ncatt_put(ncout, "depth", attname = "standard_name", attval = "depth")
       ncatt_put(ncout, "depth", attname = "positive", attval = "down")
       ncatt_put(ncout, "depth", attname = "axis", attval = "Z")
+      
+      ncatt_put(ncout, "depth_bnds", attname = "standard_name", attval = "depth_bounds")
+      ncatt_put(ncout, "depth_bnds", attname = "positive", attval = "down")
+      ncatt_put(ncout, "depth_bnds", attname = "comment",
+                attval = "bnds=0 for the top of the layer, and bnds=1 for the bottom of the layer")
       
       ncvar_change_missval(ncout, nc_var, missval = fillvalue)
     }
