@@ -106,6 +106,11 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
     lwr_bnds = abs(deps) + bnd_step
     upr_bnds[upr_bnds < 0] = 0
     lwr_bnds[lwr_bnds > max_depth] = max_depth
+    
+    # Change depth of the upper- and lowermost layers
+    deps[1] = -1 * mean(c(upr_bnds[1], lwr_bnds[1]))
+    deps[length(deps)] = -1 * mean(c(upr_bnds[length(deps)], lwr_bnds[length(deps)]))
+    
     bnd_mtr = rbind(upr_bnds, lwr_bnds)
   }
   
