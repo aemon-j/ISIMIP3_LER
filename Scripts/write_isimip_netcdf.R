@@ -102,7 +102,6 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
     # Compute depth-bounds matrix
     bnd_step = (deps[1] - deps[2]) / 2
     max_depth = max(abs(deps))
-    the_bnds = 1
     upr_bnds = abs(deps) - bnd_step
     lwr_bnds = abs(deps) + bnd_step
     upr_bnds[upr_bnds < 0] = 0
