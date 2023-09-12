@@ -268,7 +268,8 @@ for(i in lakes){
         if(k == "calibration"){
           add_spin_up(the_folder, spin_up_years = spin_up_period, spin_up_source = "met_file")
         }else{
-          add_spin_up(the_folder, spin_up_years = spin_up_period)
+          add_spin_up(the_folder, spin_up_years = spin_up_period, use_historical_for_future = T,
+                      scenario = k)
         }
       }
       
