@@ -13,13 +13,22 @@
 #                 of the "historical" meteorology for the future climate scenario.
 #                 If TRUE, will check the `scenario` argument, and if it a future
 #                 scenario, will read the historical met file to create the
-#                 spin-up. Only works if `spin_up_source` == "recycle"
+#                 spin-up. Only works if `spin_up_source` == "recycle".
+#                 Also, the "max_repetition_years" argument was added. A maximum
+#                 period is repeated multiple times if spin_up_years
+#                 exceeds this value. Only works if `spin_up_source` == "recycle" &
+#                 use_historical_for_future == FALSE.
 
 add_spin_up = function(folder, spin_up_years = 0L, spin_up_source = "recycle",
-                       use_historical_for_future = FALSE, scenario = ""){
+                       use_historical_for_future = FALSE, scenario = "",
+                       max_repetition_years = as.integer(1E9)){
   
   if(!is.integer(spin_up_years)){
     stop("add_spin_up function can only run with an integer number of years. E.g. '3L'")
+  }
+  
+  if(!is.integer(max_repetition_years) | max_repetition_years <= 0.0){
+    stop("'max_repetition_years' needs be an integer and larger than 0!")
   }
   
   the_start_date = get_yaml_multiple(file.path(folder, "LakeEnsemblR.yaml"),
@@ -42,14 +51,29 @@ add_spin_up = function(folder, spin_up_years = 0L, spin_up_source = "recycle",
       df_meteo = rbindlist(list(df_meteo_hist[datetime >= the_start_date - years(spin_up_years)],
                                 df_meteo))
     }else{
-      # Repeat the first spin_up_years years
-      ind = df_meteo[datetime < (the_start_date + years(spin_up_years)), .N]
       
-      # Place in front
-      df_meteo = df_meteo[c(1:ind, 1:.N)]
-      
-      # Subtract the years
-      df_meteo[1:ind, datetime := datetime - years(spin_up_years)]
+      if(max_repetition_years < spin_up_years){
+        repetitions = spin_up_years %/% max_repetition_years + 1
+        
+        ind_to_repeat = df_meteo[datetime < (the_start_date + years(max_repetition_years)), .N]
+        part_to_repeat = df_meteo[1:ind_to_repeat]
+        
+        for(i in seq_len(repetitions)){
+          df_meteo = rbindlist(list(part_to_repeat,
+                                    df_meteo))
+          df_meteo[1:ind_to_repeat, datetime := datetime - years(max_repetition_years) * i]
+        }
+        
+      }else{
+        # Repeat the first spin_up_years years
+        ind = df_meteo[datetime < (the_start_date + years(spin_up_years)), .N]
+        
+        # Place in front
+        df_meteo = df_meteo[c(1:ind, 1:.N)]
+        
+        # Subtract the years
+        df_meteo[1:ind, datetime := datetime - years(spin_up_years)]
+      }
     }
     
     # Deal with leap years: remove generated NAs and fill gaps with date before
@@ -65,11 +89,9 @@ add_spin_up = function(folder, spin_up_years = 0L, spin_up_source = "recycle",
     
     df_meteo[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
     fwrite(df_meteo, file.path(folder, "meteo.csv"))
-    
-    new_start_date = df_meteo[1L, datetime]
-  }else{
-    new_start_date = format(the_start_date - years(spin_up_years), "%Y-%m-%d %H:%M:%S")
   }
+  
+  new_start_date = format(the_start_date - years(spin_up_years), "%Y-%m-%d %H:%M:%S")
   
   ### Configuration file
   input_yaml_multiple(file.path(folder, "LakeEnsemblR.yaml"),
