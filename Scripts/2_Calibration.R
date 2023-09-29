@@ -16,7 +16,7 @@ cal_tasks = data.table(Lakes = lakes,
 # Lakes with a non-existing calibration folder or an empty one need to be removed
 for(i in seq_len(nrow(cal_tasks))){
   the_folder = file.path(folder_root, folder_data, cal_tasks[i, Lakes], tolower(calib_gcm), "calibration")
-  if(!dir.exists(the_folder) | length(list.files(the_folder)) == 0L){
+  if(!dir.exists(the_folder) | length(list.files(the_folder)) <= 1L){
     cal_tasks[i, Data := 0L]
   }
 }
