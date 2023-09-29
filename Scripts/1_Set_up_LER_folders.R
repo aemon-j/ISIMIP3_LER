@@ -137,6 +137,7 @@ for(i in lakes){
           }
           df_obs_cal[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
           df_obs_val[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
+          df_obs[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
           
           fwrite(df_obs_cal, file.path(the_folder, "obs_wtemp.csv"))
           fwrite(df_obs_val, file.path(the_folder, "obs_wtemp_val.csv"))
@@ -165,7 +166,7 @@ for(i in lakes){
         if(calib_type == "standard"){
           cal_start_date = df_obs[1L, datetime]
         }else if(calib_type == "cal_project"){
-          cal_start_date = start_cal
+          cal_start_date = format(start_cal, "%Y-%m-%d %H:%M:%S")
         }
         
         if(as.POSIXct(df_obs[.N, datetime]) < df_meteo[.N, datetime]){

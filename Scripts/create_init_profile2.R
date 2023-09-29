@@ -20,6 +20,16 @@ create_init_profile2 = function(df_obs, start_date = "2001-01-01", margin_time =
   year(start_date) = 2001 # Set to non leap year
   mindate = start_date - margin_time
   maxdate = start_date + margin_time
+  
+  # If mindate or maxdate would be a non-existing date (e.g. February 30th),
+  # an NA could occur
+  if(is.na(mindate)){
+    mindate = start_date - days(floor(as.numeric(margin_time) / 86400))
+  }
+  if(is.na(maxdate)){
+    maxdate = start_date + days(floor(as.numeric(margin_time) / 86400))
+  }
+  
   minDOY = yday(mindate)
   maxDOY = yday(maxdate)
   
