@@ -54,7 +54,10 @@ for(i in lakes){
     if(calib_type == "cal_project"){
       # Write to same folder as "LakeEnsemblR_calib.yaml" and then don't do
       # the whole loop over the gcms and scens
-      ls_LER_config = read.config(file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR.yaml"))
+      file.copy(file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR.yaml"),
+                file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR_calib.yaml"),
+                overwrite = T)
+      ls_LER_config = read.config(file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR_calib.yaml"))
       
       for(m in pars_to_set){
         if(m %in% c("wind_speed", "swr", "lwr")){
@@ -135,11 +138,13 @@ for(i in lakes){
   }
   
   # Update the config file for every sub-folder of the lake
-  for(j in gcms){
-    for(k in scens[!(scens %in% "calibration")]){
-      export_config("LakeEnsemblR.yaml",
-                    model = models_to_run,
-                    folder = file.path(folder_root, folder_data, i, tolower(j), k))
+  if(calib_type != "cal_project"){
+    for(j in gcms){
+      for(k in scens[!(scens %in% "calibration")]){
+        export_config("LakeEnsemblR.yaml",
+                      model = models_to_run,
+                      folder = file.path(folder_root, folder_data, i, tolower(j), k))
+      }
     }
   }
   
