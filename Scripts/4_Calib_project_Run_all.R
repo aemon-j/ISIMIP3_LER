@@ -65,13 +65,19 @@ for(i in lakes){
                  return(result)
                }))
   
+  # Avoid issues with empty ice_height and wtemp file
+  lines_cnfg = readLines(file.path(std_folder, "LakeEnsemblR.yaml"))
+  lines_cnfg = gsub(" file:$", " file:  ", lines_cnfg)
+  writeLines(lines_cnfg, con = file.path(std_folder, "LakeEnsemblR.yaml"))
+  
   ### Copy all files
   file_hyps = ls_LER_config[["location"]][["hypsograph"]]
   file_init = ls_LER_config[["input"]][["init_temp_profile"]][["file"]]
   file_met = ls_LER_config[["input"]][["meteo"]][["file"]]
+  file_wtempobs = ls_LER_config[["observations"]][["temperature"]][["file"]]
   
-  file.copy(file.path(cal_folder, c(file_hyps, file_init, file_met)),
-            file.path(std_folder, c(file_hyps, file_init, file_met)),
+  file.copy(file.path(cal_folder, c(file_hyps, file_init, file_met, file_wtempobs)),
+            file.path(std_folder, c(file_hyps, file_init, file_met, file_wtempobs)),
             overwrite = T)
   
   ### Run export_config
