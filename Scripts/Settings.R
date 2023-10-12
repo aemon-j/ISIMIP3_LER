@@ -41,8 +41,7 @@ cal_iterations = 2000
 cmethod = "LHC" # Calibration method to use, see ?cali_ensemble
 
 # cal_project only:
-min_duration_obs = 10 # years
-val_duration = 5 # years. Remainder will be calibration period
+max_duration_run = 10 # years
 
 #### IMPORTANT!!!!!
 #### THE PARAMETERS TO CALIBRATE AND THEIR RANGES SHOULD BE SET IN THE "LakeEnsemblR.yaml" FILE
