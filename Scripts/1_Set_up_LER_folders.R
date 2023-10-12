@@ -52,13 +52,6 @@ for(i in lakes){
   }
   setnames(df_obs, c("datetime", "Depth_meter", "Water_Temperature_celsius"))
   
-  if(calib_type == "cal_project"){
-    # Skip the lake if there are no sufficient observations
-    if(difftime(df_obs[.N, datetime], df_obs[1L, datetime], units = "days") <
-       min_duration_obs * 365){
-      next
-    }
-  }
   df_obs[, datetime := format(datetime, "%Y-%m-%d %H:%M:%S")]
   
   ##### Select depth resolution of output -----
@@ -119,15 +112,29 @@ for(i in lakes){
         if(calib_type == "standard"){
           fwrite(df_obs, file.path(the_folder, "obs_wtemp.csv"))
         }else if(calib_type == "cal_project"){
-          # End date validation: earliest of end of forcing set or end in-lake obs
+          ## End date validation: earliest of end of forcing set or end in-lake obs
           df_meteo = fread(file.path(the_folder, "meteo.csv"))
           end_forcing_set = df_meteo[.N, datetime]
           end_lake_obs = as.POSIXct(df_obs[.N, datetime])
           end_val = min(end_forcing_set, end_lake_obs)
+          end_val = ceiling_date(end_val, unit = "days")
           
-          # Restrict runtime to min_duration_obs years (without spin-up)
-          start_cal = end_val - years(min_duration_obs)
-          start_val = end_val - years(val_duration)
+          ## Start calibration: start obs, or max_duration_run before end_val
+          start_lake_obs = as.POSIXct(df_obs[1L, datetime])
+          diff_start_obs = as.numeric(difftime(end_val, start_lake_obs, units = "days"))
+          if(max_duration_run > diff_start_obs / 365){
+            # Obs shorter than max_duration_run. Set start of calibration to the start of the observations
+            start_cal = start_lake_obs
+          }else{
+            # Longer obs than max_duration_run. Cut duration to max_duration_run years
+            start_cal = end_val - years(max_duration_run)
+          }
+          start_cal = floor_date(start_cal, unit = "days")
+          
+          ## Start validation halfway
+          diff_start_end = as.numeric(difftime(end_val, start_cal, units = "days"))
+          start_val = start_cal + days(ceiling(diff_start_end / 2))
+          start_val = ceiling_date(start_val, unit = "days")
           
           df_obs[, datetime := as.POSIXct(datetime)]
           df_obs_cal = df_obs[datetime >= start_cal & datetime < start_val]
