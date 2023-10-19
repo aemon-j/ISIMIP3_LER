@@ -182,6 +182,11 @@ for(i in alqueva_temp_obs_files){
   fwrite(df_temp_alqueva, file.path(folder_lake_char, "Alqueva", i))
 }
 
+# Sammamish - One observation with negative depth
+df_temp_sammamish = fread(file.path(folder_lake_char, "Sammamish", "Sammamish_temp_subdaily_2008.csv"))
+df_temp_sammamish = df_temp_sammamish[DEPTH < 0.0, DEPTH := 0.0]
+fwrite(df_temp_sammamish, file.path(folder_lake_char, "Sammamish", "Sammamish_temp_subdaily_2008.csv"))
+
 # Lower Zurich - <3% of data in 1902, then rest 1978-2013. Remove 1902 data, as major bottleneck for calib
 df_temp_lzurich = fread(file.path(folder_lake_char, "LowerLakeZurich", "LowerZurich_temp_daily.csv"))
 df_temp_lzurich = df_temp_lzurich[as.POSIXct(as.character(TIMESTAMP), format = "%Y%m%d") > as.POSIXct("1975-01-01")]
