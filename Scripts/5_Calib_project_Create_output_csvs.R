@@ -26,6 +26,8 @@ for(i in lakes){
   setnames(df_obs_val, c("datetime", "depth", "obs"))
   
   # df_obs_all = rbindlist(list(df_obs_cal, df_obs_val))
+  obs_depths = unique(c(df_obs_cal$depth, df_obs_val$depth))
+  obs_depths = obs_depths[order(obs_depths)]
   
   ### Get simulation outputs
   # Do not use the "obs" part of the output, as validation was not included
@@ -37,7 +39,7 @@ for(i in lakes){
                           var = "temp", print = F)
   
   for(j in models_to_run){
-    # Calibrated
+    ### Calibrated
     df_sim_cal = output_cal[[j]]
     setDT(df_sim_cal)
     df_sim_cal = melt(df_sim_cal, id.vars = "datetime",
@@ -51,12 +53,33 @@ for(i in lakes){
     first_date = df_sim_cal[1L, datetime]
     df_sim_cal = df_sim_cal[datetime >= first_date + years(spin_up_period)]
     
+    # Remove days with all NAs (FLake last day)
+    days_with_data = unique(df_sim_cal[!is.na(mod), datetime])
+    df_sim_cal = df_sim_cal[datetime %in% days_with_data]
+    
+    # Interpolate to observed depths
+    df_sim_cal_interp = expand.grid(datetime = unique(df_sim_cal$datetime),
+                                    depth = obs_depths)
+    setDT(df_sim_cal_interp)
+    setorder(df_sim_cal_interp, datetime, depth)
+    
+    df_sim_cal = merge(df_sim_cal,
+                       df_sim_cal_interp,
+                       by = c("datetime", "depth"),
+                       all = T)
+    df_sim_cal[, mod := approx(x = depth,
+                               y = mod,
+                               xout = depth,
+                               rule = 1)$y,
+               by = datetime]
+    
+    # Merge observed and simulated
     df_cal_calibrated = merge(df_obs_cal, df_sim_cal,
                               by = c("datetime", "depth"))
     df_val_calibrated = merge(df_obs_val, df_sim_cal,
                               by = c("datetime", "depth"))
     
-    # Uncalibrated
+    ### Uncalibrated
     df_sim_uncal = output_uncal[[j]]
     setDT(df_sim_uncal)
     df_sim_uncal = melt(df_sim_uncal, id.vars = "datetime",
@@ -70,6 +93,27 @@ for(i in lakes){
     first_date = df_sim_uncal[1L, datetime]
     df_sim_uncal = df_sim_uncal[datetime >= first_date + years(spin_up_period)]
     
+    # Remove days with all NAs (FLake last day)
+    days_with_data = unique(df_sim_uncal[!is.na(mod), datetime])
+    df_sim_uncal = df_sim_uncal[datetime %in% days_with_data]
+    
+    # Interpolate to observed depths
+    df_sim_uncal_interp = expand.grid(datetime = unique(df_sim_uncal$datetime),
+                                    depth = obs_depths)
+    setDT(df_sim_uncal_interp)
+    setorder(df_sim_uncal_interp, datetime, depth)
+    
+    df_sim_uncal = merge(df_sim_uncal,
+                       df_sim_uncal_interp,
+                       by = c("datetime", "depth"),
+                       all = T)
+    df_sim_uncal[, mod := approx(x = depth,
+                               y = mod,
+                               xout = depth,
+                               rule = 1)$y,
+                 by = datetime]
+    
+    # Merge observed and simulated
     df_cal_uncalibrated = merge(df_obs_cal, df_sim_uncal,
                                 by = c("datetime", "depth"))
     df_val_uncalibrated = merge(df_obs_val, df_sim_uncal,
