@@ -29,8 +29,14 @@ p_dist_r <- res$wide %>% ggplot() + geom_histogram(aes(x = r, fill = model),
                                        alpha=0.6, position = 'identity') +
   facet_wrap(~lake) + ggtitle("Pearson corelation") + thm
 
-# create new column for the two calibration runs
-res$wide$run <- (ymd_hm(res$wide$cdate) > ymd("20230212")) + 1
+# create new column for the four calibration runs
+res$wide$run <- case_when(ymd_hm(res$wide$cdate) < ymd("20230212") ~ 1,
+                          ymd_hm(res$wide$cdate) > ymd("20230212") &  
+                            ymd_hm(res$wide$cdate) < ymd("20230312") ~ 2,
+                          ymd_hm(res$wide$cdate) > ymd("20230312") &
+                          ymd_hm(res$wide$cdate) < ymd("20230403") ~ 3,
+                          ymd_hm(res$wide$cdate) > ymd("20230403") ~ 4,
+                          .ptype = integer(0))
 
 best <- res$wide %>% group_by(lake = lake,
                               model = model,
@@ -39,7 +45,7 @@ best <- res$wide %>% group_by(lake = lake,
             maxR = max(r, na.rm = TRUE)) %>%
   slice(which.min(minRMSE))
   
-# best for the two runs seperately
+# best for the four runs seperately
 best_sep <- res$wide %>% group_by(lake = lake,
                               model = model,
                               run = run) %>%
@@ -50,7 +56,8 @@ best <- left_join(best, lake_meta, by = c("lake" = "Lake.Short.Name"))
 
 ggplot(best) + geom_histogram(aes(x = run))
 
-p_best_rmse <- ggplot(best) + geom_col(aes(x = model, y = minRMSE, fill = model)) +
+p_best_rmse <- best_sep %>% filter(run == 3) %>% ggplot() +
+  geom_col(aes(x = model, y = minRMSE, fill = model)) +
   facet_wrap(~lake) + ggtitle("minimum RMSE (°C)") + thm
 
 p_best_r <- ggplot(best) + geom_col(aes(x = model, y = maxR, fill = model)) +
@@ -92,7 +99,7 @@ p_dist_model <- ggplot(best) + geom_histogram(aes(x = minRMSE, fill = model,
    geom_density(aes(x = minRMSE, y =..density.., col = model), lwd = 1.5) + 
   ggtitle("Model performance (RMSE) distribution") + thm
 
-p_dist_model_2runs <- ggplot(best_sep) + geom_histogram(aes(x = minRMSE, fill = model,
+p_dist_model_all_runs <- ggplot(best_sep) + geom_histogram(aes(x = minRMSE, fill = model,
                                                   y = ..density..),
                                               alpha=0.6, position = 'identity', bins = 40) + 
   geom_density(aes(x = minRMSE, y =..density.., col = model), lwd = 1.5) + 
@@ -104,7 +111,7 @@ p_dist_lake <- best %>% group_by(lake) %>% summarise(minRMSE = min(minRMSE)) %>%
   geom_density(aes(x = minRMSE, y =..density..), lwd = 1.5) + 
   ggtitle("best RMSE of any model per lake") + thm
 
-p_dist_lake_2runs <- best_sep %>% group_by(lake, run) %>% summarise(minRMSE = min(minRMSE)) %>%
+p_dist_lake_all_runs <- best_sep %>% group_by(lake, run) %>% summarise(minRMSE = min(minRMSE)) %>%
   ggplot() + geom_histogram(aes(x = minRMSE, y = ..density..),
                             alpha=0.6, position = 'identity', bins = 20) + 
   geom_density(aes(x = minRMSE, y =..density..), lwd = 1.5) + 
@@ -132,6 +139,7 @@ best %>% group_by(model) %>%
             n_2 = sum(minRMSE<2, na.rm = TRUE),
             n_25 = sum(minRMSE<2.5, na.rm = TRUE)) %>% print()
 
+
 ## check if the boundaries of the parameters are a problem
 
 plot_par_dist <- function(slake, res, model = c("FLake", "GLM", "GOTM",
@@ -142,8 +150,9 @@ plot_par_dist <- function(slake, res, model = c("FLake", "GLM", "GOTM",
     par <- select(dat, c("model", colnames(dat)[11:24])) %>%
       filter(model == m) %>% mutate(across(.fns = function(x)sum(!is.na(x)))) %>%
       select(which(colMeans(.)>0), -model) %>% colnames()
-  p[[m]] <- dat %>% filter(model == m) %>% select(c(par, "rmse", "par_id")) %>% pivot_longer(1:5) %>%
-      ggplot() + geom_point(aes(x = value, y = rmse)) +
+  p[[m]] <- dat %>% filter(model == m) %>% select(c(par, "rmse", "par_id", "run")) %>%
+    pivot_longer(1:5) %>%
+      ggplot() + geom_point(aes(x = value, y = rmse, col = as.factor(run))) +
       facet_wrap(.~name, scales = "free_x") + scale_x_log10() +
       ggtitle(paste0(slake, " - ", m))
   }
@@ -165,4 +174,18 @@ best <- left_join(best, lwa)
 m <- lm(var_rmse ~ latitude.dec.deg+longitude.dec.deg+mean.depth.m+lake.area.sqkm+elevation.m, best)
 ms <- step(m, direction = "both")
 summary(m)
+
+
+# gotm performance
+res$wide %>% filter(model == "GOTM") %>% group_by(lake) %>%
+  summarise(minRMSE = min(rmse, na.rm = TRUE)) %>%
+  left_join(lake_meta, by = c(lake = "Lake.Short.Name")) %>%
+  ggplot() + geom_point(aes(y = minRMSE, x = latitude.dec.deg))
+
+
+# extract the set for just the last 2000 model runs
+res_cali <- res$wide %>% group_by(model, lake) %>%
+  mutate(take = ymd_hm(cdate) == max(ymd_hm(cdate))) %>% filter(take)
+
+save(res_cali, file = "cali_runs_n2000.RData")
 

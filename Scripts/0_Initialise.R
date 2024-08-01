@@ -5,10 +5,11 @@ dir_name = getwd() # In Rstudio, this works better: dirname(rstudioapi::getActiv
 folder_root = file.path(dir_name, "..")
 
 folder_scripts = "Scripts"
+#folder_data = "Calib_project"
 folder_data = "ISIMIPdata"
 folder_template_LER = "LER_template"
 folder_lakechar = "LakeCharacteristics"
-folder_out = "Output"
+folder_out = "Output/lakes_local"
 folder_test_result = "Other/Test dataset"
 folder_report = "Reports"
 folder_isimip_root = "ISIMIPdownload"

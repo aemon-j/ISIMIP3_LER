@@ -27,6 +27,12 @@ for(i in lakes){
   ### Get best calibration for every model
   the_files = list.files(the_folder)
   
+  if(calib_type == "cal_project"){
+    file.copy(file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR.yaml"),
+              file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR_calib.yaml"),
+              overwrite = T)
+  }
+  
   for(j in models_to_run){
     
     param_files = the_files[grepl(paste0("params_", j), the_files)]
@@ -54,9 +60,6 @@ for(i in lakes){
     if(calib_type == "cal_project"){
       # Write to same folder as "LakeEnsemblR_calib.yaml" and then don't do
       # the whole loop over the gcms and scens
-      file.copy(file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR.yaml"),
-                file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR_calib.yaml"),
-                overwrite = T)
       ls_LER_config = read.config(file.path(folder_root, folder_data, i, tolower(calib_gcm), "calibration", "LakeEnsemblR_calib.yaml"))
       
       for(m in pars_to_set){
@@ -95,14 +98,14 @@ for(i in lakes){
     }
     
     for(k in gcms){
-      for(l in scens[!(scens %in% "calibration")]){
+      #for(l in scens[!(scens %in% "calibration")]){
+      for(l in scens){
         
         LER_config_path = file.path(folder_root, folder_data, i, tolower(k), l, "LakeEnsemblR.yaml")
         ls_LER_config = read.config(LER_config_path)
         
         # We now have the file that needs to be changed and the best calibration for one of the models
         # Enter this information in the LakeEnsemblR.yaml file
-        
         for(m in pars_to_set){
           if(m %in% c("wind_speed", "swr", "lwr")){
             # Add in scaling_factors section
@@ -140,7 +143,8 @@ for(i in lakes){
   # Update the config file for every sub-folder of the lake
   if(calib_type != "cal_project"){
     for(j in gcms){
-      for(k in scens[!(scens %in% "calibration")]){
+      #for(k in scens[!(scens %in% "calibration")]){
+      for(k in scens){
         export_config("LakeEnsemblR.yaml",
                       model = models_to_run,
                       folder = file.path(folder_root, folder_data, i, tolower(j), k))
