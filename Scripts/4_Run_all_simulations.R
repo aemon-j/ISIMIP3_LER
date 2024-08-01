@@ -24,6 +24,7 @@ lakes = sim_tasks[, Lakes]
 
 # Now also multiple gcms and scens
 sim_tasks = expand.grid(lakes, gcms, scens[!(scens %in% "calibration")])
+#sim_tasks = expand.grid(lakes, gcms, scens) use this to also run for calib scen and get profiles for best performing params
 setDT(sim_tasks)
 setnames(sim_tasks, c("Lakes", "GCM", "Scen"))
 setorder(sim_tasks, Lakes, GCM)

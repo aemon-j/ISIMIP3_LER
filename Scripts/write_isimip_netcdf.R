@@ -31,8 +31,8 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
   }
   
   # What to do with NA data?
-  fillvalue = 1e20
-  missvalue = 1e20
+  fillvalue = 1E20
+  missvalue = 1E20
   
   # Define variable
   if(is.null(ncol(vals)) & is.null(deps)){
@@ -42,11 +42,11 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
                        prec = "float", compression = compression, shuffle = FALSE)
   }else{
     nc_var = ncvar_def(var_name, var_unit,
-                       list(lon1, lat2, levlakdim, timedim),
+                       list(lon1, lat2, levlakdim,  timedim),
                        fillvalue, var_longname,
                        prec = "float", compression = compression, shuffle = FALSE)
     depth_var = ncvar_def("depth", "m",
-                          list(levlakdim),
+                          list(lon1, lat2, levlakdim),
                           missval = NULL,
                           longname = "Depth of Vertical Layer Center Below Surface",
                           prec = "float", compression = compression, shuffle = FALSE)
@@ -83,6 +83,8 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
   
   # Add standard name to the variable
   ncatt_put(ncout, varid = var_name, attname = "standard_name", attval = var_name)
+  # Add remark about bounds
+  ncatt_put(ncout, varid = "depth", attname = "bounds", attval = "depth_bnds")
   
   # Add standard names and axis names to the dimensions
   ncatt_put(ncout, varid = "lon", attname = "standard_name", attval = "longitude")
@@ -126,9 +128,9 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
       # Add 2D variable
       ncvar_put(nc = ncout, varid = depth_var, vals = as.double(-deps))
       ncvar_put(nc = ncout, varid = depthbnd_var, vals = bnd_mtr)
-      ncvar_put(nc = ncout, varid = nc_var, vals = vals)
+      ncvar_put(nc = ncout, varid = nc_var, vals = t(vals))
       
-      ncatt_put(ncout, "depth", attname = "standard_name", attval = "depth")
+      ncatt_put(ncout, "depth", attname = "standard_name", attval = "depth_below_surface")
       ncatt_put(ncout, "depth", attname = "positive", attval = "down")
       ncatt_put(ncout, "depth", attname = "axis", attval = "Z")
       
@@ -147,4 +149,5 @@ write_isimip_netcdf = function(vals, time, deps = NULL, var_name, var_unit,
   }, finally = {
     nc_close(ncout) # Close netCDF file
   })
+  system(paste0("ncatted -a missing_value,watertemp,o,f,1E+20 ", file_name))
 }

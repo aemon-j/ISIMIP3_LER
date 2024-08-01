@@ -28,6 +28,7 @@ run_calib_on_core = function(cal_tasks, core_job){
                   num = cal_iterations,
                   cmethod = cmethod,
                   model = models_to_run)
+    gc()
     end_time <- Sys.time()
     # Note: Cannot be run without setting wd
     # can't find file, despite file.exists(file.path(cal_folder, "LakeEnsemblR.yaml")) being TRUE
