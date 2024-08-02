@@ -1,0 +1,9 @@
+This folder can collect any reports that are written during workflow execution. It helps you to
+track on what core which lakes are run and if any runs have already finished. This can be helpful
+to discover where bottlenecks are, or what run is causing problems.
+
+A report could show the following information:
+Core:17,Method:LHC,number_of_runs:2000,Start_time:2023-09-29 11:11:58,Tasks:2,Lake_names:'Harp, TwoSisters'
+Lake,Start_time,End_time
+Harp,2023-09-29 11:11:58,2023-09-30 10:25:40
+TwoSisters,2023-09-30 10:25:40,2023-10-01 05:54:22
