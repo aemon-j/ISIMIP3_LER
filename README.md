@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/455537462.svg)](https://zenodo.org/doi/10.5281/zenodo.13165427)
+
 # Workflow
 
 ## Only once
