@@ -37,8 +37,13 @@ lakes = c("Allequash", "Alqueva", "Annie", "Arendsee", "Argyle", "Biel",
           "Washington", "Windermere", "Wingra", "Zlutice", "Zurich")
 
 #lakes =  "Kivu" #"Tahoe"#
- 
+
+## model to run 
 models_to_run = c("FLake", "GLM", "GOTM", "Simstrat")
+
+# # for additional calibration round only run GOTM and Simstrat
+# models_to_run = c("GOTM", "Simstrat")
+
 
 
 calib_type = "standard" # "standard" or "cal_project"
